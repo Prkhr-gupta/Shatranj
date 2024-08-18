@@ -1,0 +1,41 @@
+.Swal-btn-confirm {
+  width: 5rem;
+  height: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: white;
+  color: black;
+  border: 1px solid gold;
+  border-radius: 0.5rem;
+}
+.Swal-btn-confirm:hover {
+  background-color: rgb(230, 230, 230);
+}
+
+.Swal-btn-deny {
+  width: 5rem;
+  height: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+  border-radius: 0.5rem;
+}
+.Swal-btn-deny:hover {
+  background-color: rgb(20, 20, 20);
+}
+
+.Swal-btn-resign {
+  width: 5rem;
+  height: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: rgb(165, 43, 43);
+  color: white;
+  border: 1px solid white;
+  border-radius: 0.5rem;
+}
+.Swal-btn-resign:hover {
+  background-color: rgb(126, 34, 34);
+}

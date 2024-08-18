@@ -2,7 +2,14 @@ const express = require("express");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const { createServer } = require("node:http");
+const { Server } = require("socket.io");
+const myIo = require("./socket/io.js");
+
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
+myIo(io);
 const port = 8080;
 
 app.set("view engine", "ejs");
@@ -20,6 +27,10 @@ app.get("/computer", (req, res) => {
   res.render("pages/computer");
 });
 
-app.listen(port, () => {
+app.get("/online", (req, res) => {
+  res.render("pages/bullet.ejs");
+});
+
+server.listen(port, () => {
   console.log("App is listening on port 8080");
 });
