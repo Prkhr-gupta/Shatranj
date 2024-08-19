@@ -49,33 +49,27 @@
     </div>
   </div>
   <div>
-    <div class="text-white">Computer</div>
+    <div class="text-white">Player 2</div>
     <div id="myBoard" style="width: 460px"></div>
     <div class="text-white">Player 1</div>
   </div>
-  <div
-    class="bg-neutral-900 w-1/4 flex flex-col justify-center items-center rounded-3xl"
-  >
+  <div class="bg-neutral-900 w-1/4 rounded-3xl text-white">
+    <div class="mx-4 mt-4 mb-3 text-center">Live Chat</div>
+    <div class="ml-4"><b>Player 2</b></div>
     <div
-      class="h-24 text-white flex justify-center items-center text-4xl mx-4 mb-4"
-    >
-      Play Chess <br />
-      <img src="img/playwhite.cea685ba.svg" alt="image" />
-    </div>
-    <div
-      class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2"
-    >
-      Play Online
-    </div>
-    <div
-      class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2"
-    >
-      Play Computer
-    </div>
-    <div
-      class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2"
-    >
-      Play a Friend
+      class="h-80 mt-2 flex flex-col outline outline-neutral-800 overflow-y-auto pt-2 chatTimeline relative w-full p-2"
+      id="messages"
+    ></div>
+    <div class="my-4 mx-3 flex">
+      <input
+        type="text"
+        class="flex-grow focus:outline-none text-black px-3 py-1 rounded-2xl mr-2"
+        id="newMsg"
+        placeholder="Enter message"
+      />
+      <button class="mx-1" id="sendMsg">
+        <img class="h-8 active:scale-50" src="img/sendMsg.png" alt="sendMsg" />
+      </button>
     </div>
   </div>
 </div>

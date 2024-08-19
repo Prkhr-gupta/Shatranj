@@ -39,3 +39,7 @@
 .Swal-btn-resign:hover {
   background-color: rgb(126, 34, 34);
 }
+
+.timer {
+  background-color: white;
+}

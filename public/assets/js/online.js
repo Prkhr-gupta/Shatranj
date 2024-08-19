@@ -12,10 +12,11 @@ var whiteMove = document.querySelector(".whiteMove");
 var blackMove = document.querySelector(".blackMove");
 var cnt = 1;
 var messageBody = document.querySelector(".moveTimeline");
+var chatBody = document.querySelector(".chatTimeline");
 const urlParams = new URLSearchParams(window.location.search);
 const roomId = urlParams.get("roomId");
 const player_color = urlParams.get("color");
-socket.emit("join room", roomId);
+socket.emit("join room", roomId, player_color);
 let gameHasStarted = false;
 let gameOver = false;
 var draw = document.getElementById("draw");
@@ -136,8 +137,8 @@ function onDragStart(source, piece, position, orientation) {
   }
 }
 
-function updateSidebar(move) {
-  let currMove = game.history()[game.history().length - 1];
+function updateSidebar(move, history) {
+  let currMove = history[history.length - 1];
   let li = document.createElement("li");
   li.innerText = currMove;
   li.style.marginTop = "0.5rem";
@@ -171,22 +172,24 @@ function onDrop(source, target) {
 
   // illegal move
   if (move === null) return "snapback";
-  updateSidebar(move);
+  updateSidebar(move, game.history());
   moveSound.play();
   socket.emit(
     "move",
     theMove,
     roomId,
     player_color,
+    game.history(),
     game.history({ verbose: true })
   );
+  console.log(game.history());
   updateStatus();
 }
 
 socket.on("newMove", function (theMove, gameInfo) {
   let move = game.move(theMove);
   if (move === null) return;
-  updateSidebar(move);
+  updateSidebar(move, game.history());
   board.position(game.fen());
   updateStatus();
 });
@@ -286,33 +289,9 @@ if (player_color == "black") {
 
 updateStatus();
 
-socket.on("startGame", function (gameInfo) {
-  gameHasStarted = true;
-  let arr = gameInfo.history;
-  for (let i = 0; i < arr.length; i++) {
-    let str = `${arr[i].from}-${arr[i].to}`;
-    board.move(str);
-    let theMove = game.move({
-      from: arr[i].from,
-      to: arr[i].to,
-      promotion: "q",
-    });
-    updateSidebar(theMove);
-    updateStatus();
-  }
-});
-
-socket.on("opp resigned", () => {
-  gameAlert("You Won", "by resignation", "success");
-});
-
 const Toast = Swal.mixin({
   toast: true,
   position: "top-end",
-  showConfirmButton: true,
-  showDenyButton: true,
-  confirmButtonText: "Accept",
-  denyButtonText: "Decline",
   timer: 4000,
   timerProgressBar: true,
   didOpen: (toast) => {
@@ -325,13 +304,68 @@ const Toast = Swal.mixin({
   customClass: {
     confirmButton: "Swal-btn-confirm",
     denyButton: "Swal-btn-deny",
+    timerProgressBar: "timer",
   },
+});
+
+socket.on("enterGame", function (gameInfo) {
+  console.log("refreshed");
+  let arr = gameInfo.verbose;
+  let history = [];
+  for (let i = 0; i < arr.length; i++) {
+    let str = `${arr[i].from}-${arr[i].to}`;
+    board.move(str);
+    let theMove = game.move({
+      from: arr[i].from,
+      to: arr[i].to,
+      promotion: "q",
+    });
+    history.push(gameInfo.history[i]);
+    updateSidebar(theMove, history);
+    updateStatus();
+  }
+});
+
+socket.on("startGame", (gameInfo) => {
+  Toast.fire({
+    icon: "info",
+    // title: "Match starting in x",
+    html: "Match starting in <b></b>",
+    didOpen: () => {
+      Toast.showLoading();
+      const timer = Toast.getPopup().querySelector("b");
+      setInterval(() => {
+        let t = Math.floor(Toast.getTimerLeft() / 1000);
+        timer.textContent = `${t}`;
+      }, 100);
+    },
+    showConfirmButton: false,
+  });
+  console.log("starting");
+  function timeout(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  async function sleep(fn, ...args) {
+    await timeout(3000);
+    return fn(...args);
+  }
+  timeout(4000).then(() => {
+    gameHasStarted = true;
+  });
+});
+
+socket.on("opp resigned", () => {
+  gameAlert("You Won", "by resignation", "success");
 });
 
 socket.on("draw offer", () => {
   Toast.fire({
     icon: "question",
     title: "Draw offered by opponent?",
+    showConfirmButton: true,
+    showDenyButton: true,
+    confirmButtonText: "Accept",
+    denyButtonText: "Decline",
   }).then((result) => {
     if (result.isConfirmed) {
       socket.emit("draw agreed", roomId);
@@ -348,6 +382,10 @@ socket.on("rematch offer", () => {
   Toast.fire({
     icon: "question",
     title: "Rematch offered by opponent?",
+    showConfirmButton: true,
+    showDenyButton: true,
+    confirmButtonText: "Accept",
+    denyButtonText: "Decline",
   }).then((result) => {
     if (result.isConfirmed) {
       gameOver = false;
@@ -367,4 +405,41 @@ socket.on("rematch accepted", (nwRoomId) => {
   window.location.replace(
     `/online?mode=bullet&roomId=${nwRoomId}&color=${nwColor}`
   );
+});
+
+let text = document.getElementById("newMsg");
+let send = document.getElementById("sendMsg");
+let msgBox = document.getElementById("messages");
+
+function createMsg(text, pos) {
+  let msg = document.createElement("div");
+  msg.innerText = text;
+  msg.style.position = "relative";
+  msg.style.display = "flex";
+  msg.style.backgroundColor = "rgb(229 229 229)";
+  msg.style.color = "black";
+  msg.style.maxWidth = "80%";
+  msg.style.textWrap = "pretty";
+  msg.style.overflowWrap = "break-word";
+  msg.style.borderTopRightRadius = "2rem";
+  msg.style.borderTopLeftRadius = "2rem";
+  if (pos == "self-end") msg.style.borderBottomLeftRadius = "2rem";
+  else msg.style.borderBottomRightRadius = "2rem";
+  msg.style.alignSelf = pos;
+  msg.style.margin = "0.5rem";
+  msg.style.padding = "0.5rem 1rem";
+  msg.style.lineHeight = "1.2rem";
+  msgBox.appendChild(msg);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+send.addEventListener("click", () => {
+  if (text.value !== "") {
+    createMsg(text.value, "self-end");
+    socket.emit("new message", roomId, text.value);
+  }
+});
+
+socket.on("msg recieved", (text) => {
+  createMsg(text, "self-start");
 });
