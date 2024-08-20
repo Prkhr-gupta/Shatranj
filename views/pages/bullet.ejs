@@ -7,7 +7,7 @@
     <div class="hidden" id="fen"></div>
     <label class="hidden">PGN:</label>
     <div class="hidden" id="pgn"></div>
-    <div class="m-4 text-center">Opening</div>
+    <div class="my-4 mx-1 text-center" id="opening">Opening</div>
     <div
       class="flex justify-center h-80 outline outline-neutral-800 overflow-y-scroll pt-2 moveTimeline"
     >
@@ -29,7 +29,7 @@
     </div>
     <div class="mx-4 my-8 h-12 flex justify-evenly items-center">
       <button
-        class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 w-24 h-8 text-black rounded-lg"
+        class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 w-24 h-8 text-black rounded-lg hidden"
         id="draw"
       >
         Draw
@@ -41,7 +41,7 @@
         Rematch
       </button>
       <button
-        class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 w-24 h-8 text-black rounded-lg active:bg-black"
+        class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 w-24 h-8 text-black rounded-lg hidden"
         id="resign"
       >
         Resign
@@ -49,13 +49,29 @@
     </div>
   </div>
   <div>
-    <div class="text-white">Player 2</div>
-    <div id="myBoard" style="width: 460px"></div>
-    <div class="text-white">Player 1</div>
+    <div class="text-white flex justify-between items-center">
+      <div id="opponent">Loading...</div>
+      <div
+        class="bg-neutral-400 text-black font-bold w-20 h-7 text-center rounded-lg mb-0.5 tracking-widest"
+        id="timer2"
+      >
+        Timer
+      </div>
+    </div>
+    <div id="myBoard" style="width: 450px"></div>
+    <div class="text-white flex justify-between">
+      <div>Player 1</div>
+      <div
+        class="bg-neutral-400 text-black font-bold w-20 h-7 text-center rounded-lg mt-0.5 tracking-widest"
+        id="timer1"
+      >
+        Timer
+      </div>
+    </div>
   </div>
   <div class="bg-neutral-900 w-1/4 rounded-3xl text-white">
     <div class="mx-4 mt-4 mb-3 text-center">Live Chat</div>
-    <div class="ml-4"><b>Player 2</b></div>
+    <div class="ml-4"><b>Loading...</b></div>
     <div
       class="h-80 mt-2 flex flex-col outline outline-neutral-800 overflow-y-auto pt-2 chatTimeline relative w-full p-2"
       id="messages"

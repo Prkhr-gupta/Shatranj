@@ -1,9 +1,20 @@
+import { openings } from "../opening.js";
+var opening = document.getElementById("opening");
+var currOp = "";
 var board = null;
 var game = new Chess();
 var $status = $("#status");
 var $fen = $("#fen");
 var $pgn = $("#pgn");
 var moveSound = new Audio("./assets/sounds/move-self.mp3");
+var captureSound = new Audio("./assets/sounds/capture.mp3");
+var castleSound = new Audio("./assets/sounds/castle.mp3");
+var gameEndSound = new Audio("./assets/sounds/game-end.webm");
+var gameStartSound = new Audio("./assets/sounds/game-start.mp3");
+var checkSound = new Audio("./assets/sounds/move-check.mp3");
+var lowTimeSound = new Audio("./assets/sounds/tenseconds.mp3");
+var promoteSound = new Audio("./assets/sounds/promote.mp3");
+var notifySound = new Audio("./assets/sounds/notify.mp3");
 var whiteSquareGrey = "#a9a9a9";
 var blackSquareGrey = "#696969";
 var redSquareRed = "#ff0000";
@@ -14,9 +25,10 @@ var cnt = 1;
 var messageBody = document.querySelector(".moveTimeline");
 var chatBody = document.querySelector(".chatTimeline");
 const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get("mode");
 const roomId = urlParams.get("roomId");
 const player_color = urlParams.get("color");
-socket.emit("join room", roomId, player_color);
+socket.emit("join room", mode, roomId, player_color);
 let gameHasStarted = false;
 let gameOver = false;
 var draw = document.getElementById("draw");
@@ -24,6 +36,9 @@ var rematch = document.getElementById("rematch");
 var resign = document.getElementById("resign");
 
 function gameAlert(title, msg, icon) {
+  gameEndSound.play();
+  gameOver = true;
+  socket.emit("game over", mode, roomId);
   Swal.fire({
     title: `${title}`,
     text: `${msg}`,
@@ -40,7 +55,6 @@ function gameAlert(title, msg, icon) {
       denyButton: "Swal-btn-deny",
     },
   }).then((result) => {
-    gameOver = true;
     draw.style.display = "none";
     resign.style.display = "none";
     rematch.style.display = "inline-block";
@@ -69,7 +83,6 @@ resign.addEventListener("click", () => {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      console.log("resigned");
       gameOver = true;
       socket.emit("resign", roomId);
       gameAlert("You Lost", "by resignation", "error");
@@ -146,6 +159,8 @@ function updateSidebar(move, history) {
   if (cnt % 2) color = "rgb(28, 28, 28)";
   li.style.backgroundColor = color;
   if (move != null && move.color == "w") {
+    if (currOp == "") currOp = currMove;
+    else currOp = currOp + " " + currMove;
     let liCnt = document.createElement("li");
     liCnt.innerText = cnt + ".";
     liCnt.style.marginTop = "0.5rem";
@@ -153,8 +168,17 @@ function updateSidebar(move, history) {
     moveCnt.appendChild(liCnt);
     whiteMove.appendChild(li);
   } else {
+    currOp = currOp + " " + currMove;
     blackMove.appendChild(li);
     cnt++;
+  }
+  if (cnt <= 3) {
+    for (let open of openings) {
+      if (open.moves == currOp) {
+        opening.innerText = open.name;
+        break;
+      }
+    }
   }
   messageBody.scrollTop = messageBody.scrollHeight;
 }
@@ -173,16 +197,15 @@ function onDrop(source, target) {
   // illegal move
   if (move === null) return "snapback";
   updateSidebar(move, game.history());
-  moveSound.play();
   socket.emit(
     "move",
+    mode,
     theMove,
     roomId,
     player_color,
     game.history(),
     game.history({ verbose: true })
   );
-  console.log(game.history());
   updateStatus();
 }
 
@@ -261,10 +284,20 @@ function updateStatus() {
     let king = game.turn() + "K";
     // check?
     if (game.in_check()) {
+      checkSound.play();
       let kingPosition = getKeyByValue(board.position(), king);
 
       redSquare(kingPosition);
       status += ", " + moveColor + " is in check";
+    } else {
+      let history = game.history({ verbose: true });
+      let lastMove = history[history.length - 1];
+      let moveType = typeof lastMove === "undefined" ? "z" : lastMove.flags;
+
+      if (moveType == "n" || moveType == "b") moveSound.play();
+      else if (moveType == "e" || moveType == "c") captureSound.play();
+      else if (moveType == "p") promoteSound.play();
+      else if (moveType == "k" || moveType == "q") castleSound.play();
     }
   }
 
@@ -309,7 +342,7 @@ const Toast = Swal.mixin({
 });
 
 socket.on("enterGame", function (gameInfo) {
-  console.log("refreshed");
+  if (gameInfo.gameHasStarted === true) gameHasStarted = true;
   let arr = gameInfo.verbose;
   let history = [];
   for (let i = 0; i < arr.length; i++) {
@@ -324,7 +357,16 @@ socket.on("enterGame", function (gameInfo) {
     updateSidebar(theMove, history);
     updateStatus();
   }
+  for (let chat of gameInfo.chats) {
+    let pos = "self-start";
+    if (player_color == chat.color) pos = "self-end";
+    createMsg(chat.text, pos);
+  }
 });
+
+let timer2 = document.getElementById("timer2");
+let timer1 = document.getElementById("timer1");
+// timer2.innerText = startTime2;
 
 socket.on("startGame", (gameInfo) => {
   Toast.fire({
@@ -341,17 +383,76 @@ socket.on("startGame", (gameInfo) => {
     },
     showConfirmButton: false,
   });
-  console.log("starting");
   function timeout(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  async function sleep(fn, ...args) {
-    await timeout(3000);
-    return fn(...args);
-  }
+  // async function sleep(fn, ...args) {
+  //   await timeout(3000);
+  //   return fn(...args);
+  // }
   timeout(4000).then(() => {
+    gameStartSound.play();
     gameHasStarted = true;
+    draw.style.display = "inline-block";
+    resign.style.display = "inline-block";
+    let t = gameInfo.timer2;
+    let min = Math.floor(t / 60);
+    let sec = t % 60;
+    let time = min + ":" + (sec < 10 ? "0" : "") + sec;
+    timer2.innerText = time;
+    timer1.innerText = time;
   });
+});
+
+let flag1 = true;
+let flag2 = true;
+socket.on("new time", (gameInfo) => {
+  if (gameOver) return;
+  let t2 = gameInfo.timer2;
+  let min2 = Math.floor(t2 / 60);
+  let sec2 = t2 % 60;
+  let time2 = min2 + ":" + (sec2 < 10 ? "0" : "") + sec2;
+  let t1 = gameInfo.timer1;
+  let min1 = Math.floor(t1 / 60);
+  let sec1 = t1 % 60;
+  let time1 = min1 + ":" + (sec1 < 10 ? "0" : "") + sec1;
+  if (player_color === gameInfo.player1Color) {
+    timer2.innerText = time2;
+    timer1.innerText = time1;
+    if (t2 <= 20) timer2.style.backgroundColor = "red";
+    else timer2.style.backgroundColor = "rgb(163 163 163)";
+    if (t1 <= 20) {
+      timer1.style.backgroundColor = "red";
+      if (flag1) {
+        lowTimeSound.play();
+        flag1 = false;
+      }
+    } else timer1.style.backgroundColor = "rgb(163 163 163)";
+    if (t2 <= 0) {
+      gameAlert("You Won", "on time", "success");
+    }
+    if (t1 <= 0) {
+      gameAlert("You Lost", "on time", "error");
+    }
+  } else {
+    timer2.innerText = time1;
+    timer1.innerText = time2;
+    if (t2 <= 20) {
+      timer1.style.backgroundColor = "red";
+      if (flag2) {
+        lowTimeSound.play();
+        flag2 = false;
+      }
+    } else timer1.style.backgroundColor = "rgb(163 163 163)";
+    if (t1 <= 20) timer2.style.backgroundColor = "red";
+    else timer2.style.backgroundColor = "rgb(163 163 163)";
+    if (t2 <= 0) {
+      gameAlert("You Lost", "on time", "error");
+    }
+    if (t1 <= 0) {
+      gameAlert("You Won", "on time", "success");
+    }
+  }
 });
 
 socket.on("opp resigned", () => {
@@ -359,6 +460,7 @@ socket.on("opp resigned", () => {
 });
 
 socket.on("draw offer", () => {
+  notifySound.play();
   Toast.fire({
     icon: "question",
     title: "Draw offered by opponent?",
@@ -379,6 +481,7 @@ socket.on("draw agreed", () => {
 });
 
 socket.on("rematch offer", () => {
+  notifySound.play();
   Toast.fire({
     icon: "question",
     title: "Rematch offered by opponent?",
@@ -400,7 +503,6 @@ socket.on("rematch accepted", (nwRoomId) => {
   if (player_color == "black") {
     nwColor = "white";
   }
-  console.log(roomId);
   socket.emit("leave room", roomId);
   window.location.replace(
     `/online?mode=bullet&roomId=${nwRoomId}&color=${nwColor}`
@@ -423,8 +525,13 @@ function createMsg(text, pos) {
   msg.style.overflowWrap = "break-word";
   msg.style.borderTopRightRadius = "2rem";
   msg.style.borderTopLeftRadius = "2rem";
-  if (pos == "self-end") msg.style.borderBottomLeftRadius = "2rem";
-  else msg.style.borderBottomRightRadius = "2rem";
+  if (pos == "self-end") {
+    msg.style.border = "1px solid rgb(34, 34, 126)";
+    msg.style.borderBottomLeftRadius = "2rem";
+  } else {
+    msg.style.borderBottomRightRadius = "2rem";
+    msg.style.border = "1px solid rgb(126, 34, 34)";
+  }
   msg.style.alignSelf = pos;
   msg.style.margin = "0.5rem";
   msg.style.padding = "0.5rem 1rem";
@@ -434,12 +541,21 @@ function createMsg(text, pos) {
 }
 
 send.addEventListener("click", () => {
-  if (text.value !== "") {
+  if (gameHasStarted && text.value !== "") {
     createMsg(text.value, "self-end");
-    socket.emit("new message", roomId, text.value);
+    socket.emit("new message", mode, roomId, text.value, player_color);
+    text.value = "";
+  }
+});
+text.addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    createMsg(text.value, "self-end");
+    socket.emit("new message", mode, roomId, text.value, player_color);
+    text.value = "";
   }
 });
 
 socket.on("msg recieved", (text) => {
+  notifySound.play();
   createMsg(text, "self-start");
 });

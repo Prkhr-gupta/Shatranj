@@ -59,11 +59,13 @@
       </button>
       <button
         class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-full h-12"
+        id="blitz"
       >
         <i class="fa-solid fa-bolt mr-2"></i>Blitz 3|2
       </button>
       <button
         class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-full h-12"
+        id="rapid"
       >
         <i class="fa-solid fa-clock mr-2"></i>Rapid 10|0
       </button>
@@ -110,10 +112,26 @@
     }
   });
   bullet.addEventListener("click", () => {
-    socket.emit("create room");
+    socket.emit("create room", "bullet");
     socket.on("room id", (roomId, color) => {
       window.location.replace(
         `/online?mode=bullet&roomId=${roomId}&color=${color}`
+      );
+    });
+  });
+  blitz.addEventListener("click", () => {
+    socket.emit("create room", "blitz");
+    socket.on("room id", (roomId, color) => {
+      window.location.replace(
+        `/online?mode=blitz&roomId=${roomId}&color=${color}`
+      );
+    });
+  });
+  rapid.addEventListener("click", () => {
+    socket.emit("create room", "rapid");
+    socket.on("room id", (roomId, color) => {
+      window.location.replace(
+        `/online?mode=rapid&roomId=${roomId}&color=${color}`
       );
     });
   });

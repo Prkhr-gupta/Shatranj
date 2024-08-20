@@ -1,35 +1,39 @@
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = (io) => {
-  let rooms = [];
-  let allGames = {};
-  allGames["randomId123"] = {
-    roomId: "randomId123",
-    history: [],
-    verbose: [],
-    player1Color: "",
-    player2Color: "",
-    gameHasStarted: false,
+  let rooms = {
+    bullet: [],
+    blitz: [],
+    rapid: [],
+  };
+  let games = {
+    bullet: {},
+    blitz: {},
+    rapid: {},
   };
   io.on("connection", (socket) => {
     console.log("New socket connection");
-    socket.on("create room", () => {
-      if (rooms.length == 0) {
+    socket.on("create room", (mode) => {
+      if (rooms[mode].length == 0) {
         let roomId = uuidv4();
         let color = "white";
-        rooms.push(roomId);
+        rooms[mode].push(roomId);
         io.to(socket.id).emit("room id", roomId, color);
       } else {
         let color = "black";
-        io.to(socket.id).emit("room id", rooms[0], color);
-        rooms.pop();
+        io.to(socket.id).emit("room id", rooms[mode][0], color);
+        rooms[mode].pop();
       }
     });
 
-    socket.on("join room", (roomId, color) => {
+    function timeout(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    socket.on("join room", (mode, roomId, color) => {
       socket.join(roomId);
-      if (typeof allGames[roomId] === "undefined") {
-        allGames[roomId] = {
+      if (typeof games[mode][roomId] === "undefined") {
+        games[mode][roomId] = {
           roomId: roomId,
           history: [],
           verbose: [],
@@ -37,29 +41,64 @@ module.exports = (io) => {
           player1Color: `${color}`,
           player2Color: "",
           gameHasStarted: false,
+          timer1: 0,
+          timer2: 0,
+          gameOver: false,
+          chats: [],
         };
+        io.to(socket.id).emit("enterGame", games[mode][roomId]);
       } else {
-        if (color !== allGames[roomId].player1Color) {
-          allGames[roomId].player2Color = `${color}`;
-          if (!allGames[roomId].gameHasStarted) {
-            io.to(roomId).emit("startGame", allGames[roomId]);
-            allGames[roomId].gameHasStarted = true;
+        if (color !== games[mode][roomId].player1Color) {
+          if (!games[mode][roomId].gameHasStarted) {
+            games[mode][roomId].player2Color = `${color}`;
+            let timeControl =
+              mode === "bullet" ? 30 : mode === "blitz" ? 180 : 600;
+            games[mode][roomId].timer1 = timeControl;
+            games[mode][roomId].timer2 = timeControl;
+            games[mode][roomId].gameHasStarted = true;
+            io.to(roomId).emit("startGame", games[mode][roomId]);
+            timeout(4000).then(() => {
+              let timeId = setInterval(() => {
+                if (
+                  games[mode][roomId].lastMoveColor ==
+                  games[mode][roomId].player1Color
+                )
+                  games[mode][roomId].timer2--;
+                else games[mode][roomId].timer1--;
+                io.to(roomId).emit("new time", games[mode][roomId]);
+                if (games[mode][roomId].gameOver == true) {
+                  clearInterval(timeId);
+                }
+              }, 1000);
+            });
+            // async function sleep(fn, ...args) {
+            //   await timeout(3000);
+            //   return fn(...args);
+            // }
           }
         }
+        io.to(socket.id).emit("enterGame", games[mode][roomId]);
       }
-      io.to(socket.id).emit("enterGame", allGames[roomId]);
+    });
+
+    socket.on("game over", (mode, roomId) => {
+      games[mode][roomId].gameOver = true;
     });
 
     socket.on("leave room", (roomId) => {
       socket.leave(roomId);
     });
 
-    socket.on("move", function (move, roomId, color, history, verbose) {
-      allGames[roomId].lastMoveColor = color;
-      allGames[roomId].history = history;
-      allGames[roomId].verbose = verbose;
+    socket.on("move", function (mode, move, roomId, color, history, verbose) {
+      games[mode][roomId].lastMoveColor = color;
+      games[mode][roomId].history = history;
+      games[mode][roomId].verbose = verbose;
+      let timeControl = mode === "bullet" ? 1 : mode === "blitz" ? 2 : 0;
+      if (color == games[mode][roomId].player1Color)
+        games[mode][roomId].timer1 += timeControl;
+      else games[mode][roomId].timer2 += timeControl;
 
-      io.to(roomId).emit("newMove", move, allGames[roomId]);
+      io.to(roomId).emit("newMove", move, games[mode][roomId]);
     });
 
     socket.on("resign", (roomId) => {
@@ -83,7 +122,8 @@ module.exports = (io) => {
       io.to(roomId).emit("rematch accepted", nwRoomId);
     });
 
-    socket.on("new message", (roomId, text) => {
+    socket.on("new message", (mode, roomId, text, color) => {
+      games[mode][roomId].chats.push({ text, color });
       socket.broadcast.to(roomId).emit("msg recieved", text);
     });
   });
