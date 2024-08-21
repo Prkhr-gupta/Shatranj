@@ -1,16 +1,38 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const myIo = require("./socket/io.js");
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const Match = require("./models/match.js");
+const User = require("./models/user.js");
+const wrapAsync = require("./utils/wrapAsync.js");
+const ExpressError = require("./utils/ExpressError.js");
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 myIo(io);
 const port = 8080;
+
+const Mongo_URL = "mongodb://127.0.0.1:27017/shatranj";
+
+main()
+  .then(() => {
+    console.log("connected to DB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+async function main() {
+  await mongoose.connect(Mongo_URL);
+}
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -19,9 +41,62 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 
+const sessionOptions = {
+  secret: "mysupersecretcode",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 2 * 24 * 60 * 60 * 1000,
+    maxAge: 2 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
+
+app.use(session(sessionOptions));
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.get("/", (req, res) => {
   res.render("pages/home.ejs");
 });
+
+// app.get("/testMatch", async (req, res) => {
+//   let sampleMatch = new Match({
+//     roomId: "randomId123",
+//     history: ["e4", "e5"],
+//     verbose: [
+//       {
+//         from: "e2",
+//         to: "e4",
+//         flags: "b",
+//       },
+//       {
+//         from: "e2",
+//         to: "e4",
+//       },
+//     ],
+//     lastMoveColor: "black",
+//     player1Color: "white",
+//     player2Color: "black",
+//     gameHasStarted: true,
+//     gameOver: true,
+//     timer1: 12,
+//     timer2: 0,
+//     chats: [
+//       { text: "hello", color: "white" },
+//       { text: "hi", color: "black" },
+//       { text: "noob", color: "white" },
+//     ],
+//   });
+//   sampleMatch.markModified("verbose");
+//   await sampleMatch.save();
+//   res.send("Match saved");
+// });
 
 app.get("/computer", (req, res) => {
   res.render("pages/computer");
@@ -29,6 +104,31 @@ app.get("/computer", (req, res) => {
 
 app.get("/online", (req, res) => {
   res.render("pages/bullet.ejs");
+});
+
+app.get("/signup", (req, res) => {
+  res.render("pages/signup.ejs");
+});
+
+app.post("/signup", (req, res) => {
+  res.send("ok");
+});
+
+app.get("/login", (req, res) => {
+  res.render("pages/login.ejs");
+});
+
+app.post("/login", (req, res) => {
+  res.send("ok");
+});
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page Not Found!"));
+});
+
+app.use((err, req, res, next) => {
+  let { statusCode = 500, message = "Some Error Occurred" } = err;
+  res.status(statusCode).render("pages/error.ejs", { message });
 });
 
 server.listen(port, () => {

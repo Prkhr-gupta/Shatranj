@@ -1,0 +1,40 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="flex justify-evenly items-center mt-4">
+  <div>
+    <div id="myBoard" style="width: 460px"></div>
+  </div>
+  <div>
+    <div class="alert alert-danger" role="alert">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i><%= message %>
+    </div>
+  </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+  crossorigin="anonymous"
+></script>
+<script src="assets/js/chess-0.10.3.min.js"></script>
+<script src="assets/js/chessboard-1.0.0.min.js"></script>
+<script>
+  var board = null;
+  var game = new Chess();
+
+  function makeRandomMove() {
+    var possibleMoves = game.moves();
+
+    // exit if the game is over
+    if (game.game_over()) return;
+
+    var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+    game.move(possibleMoves[randomIdx]);
+    board.position(game.fen());
+
+    window.setTimeout(makeRandomMove, 500);
+  }
+
+  board = Chessboard("myBoard", "start");
+
+  window.setTimeout(makeRandomMove, 500);
+</script>
