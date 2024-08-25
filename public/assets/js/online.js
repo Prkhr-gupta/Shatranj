@@ -526,11 +526,11 @@ function createMsg(text, pos) {
   msg.style.borderTopRightRadius = "2rem";
   msg.style.borderTopLeftRadius = "2rem";
   if (pos == "self-end") {
-    msg.style.border = "1px solid rgb(34, 34, 126)";
+    msg.style.border = "2px solid rgb(34, 34, 126)";
     msg.style.borderBottomLeftRadius = "2rem";
   } else {
     msg.style.borderBottomRightRadius = "2rem";
-    msg.style.border = "1px solid rgb(126, 34, 34)";
+    msg.style.border = "2px solid rgb(126, 34, 34)";
   }
   msg.style.alignSelf = pos;
   msg.style.margin = "0.5rem";

@@ -2,13 +2,13 @@
 <div
   class="h-screen"
   style="
-    background-image: url(img/chess_background2.jpg);
+    background-image: url(img/chess_background.png);
     background-size: cover;
   "
 >
   <div class="row">
-    <div class="col-5 offset-1 mt-20 bg-neutral-900 rounded-2xl">
-      <form method="POST" action="/signup" novalidate class="needs-validation">
+    <div class="col-5 offset-1 mt-20 bg-neutral-900 rounded-2xl px-12">
+      <form method="POST" action="/login" novalidate class="needs-validation">
         <h2 class="text-center text-white font-bold text-4xl mt-8 mb-4">
           Login
         </h2>
@@ -44,6 +44,12 @@
         <button class="btn btn-outline-light add-btn m-4">Log in</button>
       </form>
     </div>
+    <div class="col-7 offset-1 text-white">
+      Create new account :
+      <form class="inline" action="/signup">
+        <button class="btn btn-outline-light add-btn m-4">Sign Up</button>
+      </form>
+    </div>
   </div>
 </div>
 <script>
@@ -70,4 +76,19 @@
       );
     });
   })();
+</script>
+<script>
+  let user = "guest";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
 </script>

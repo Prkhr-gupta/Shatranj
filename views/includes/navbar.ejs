@@ -10,7 +10,25 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <span class="text-white text-3xl mr-4">Shatranj</span>
+    <div class="flex mr-4 h-10">
+      <div class="text-white text-3xl mr-4">Shatranj</div>
+      <form action="/friends">
+        <div
+          class="h-full text-center text-white flex items-center"
+          id="notifications"
+        >
+          <button class="relative">
+            <i class="fa-solid fa-bell text-xl"></i>
+            <span
+              class="position-absolute top-0 start-100 translate-middle badge rounded-full bg-danger hidden"
+              id="badge"
+            >
+              0
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
     <div
       class="offcanvas offcanvas-start text-bg-dark w-25"
       tabindex="-1"
@@ -32,7 +50,7 @@
         <div>
           <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Play</a>
+              <a class="nav-link active" aria-current="page" href="/">Play</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Learn</a>
@@ -41,7 +59,7 @@
               <a class="nav-link" href="#">Your Games</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Social</a>
+              <a class="nav-link" href="/friends">Social</a>
             </li>
           </ul>
         </div>
@@ -55,16 +73,20 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                UserName
+                <% if(!currUser) { %> Guest <% } %> <% if(currUser) { %> <%=
+                currUser.username %> <% } %>
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
+                <% if(!currUser) { %>
                 <li><a class="dropdown-item" href="/login">Log In</a></li>
                 <li>
                   <a class="dropdown-item" href="/signup">Sign Up</a>
                 </li>
+                <% } %> <% if(currUser) { %>
                 <li>
                   <a class="dropdown-item" href="/logout">Log Out</a>
                 </li>
+                <% } %>
               </ul>
             </li>
           </ul>
@@ -73,3 +95,11 @@
     </div>
   </div>
 </nav>
+<script>
+  let badge = document.getElementById("badge");
+  let notifications = document.getElementById("notifications");
+  socket.on("msg recieved", (text, from) => {
+    badge.style.display = "block";
+    badge.innerText = parseInt(badge.innerText) + 1;
+  });
+</script>

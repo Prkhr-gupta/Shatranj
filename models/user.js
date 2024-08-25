@@ -12,6 +12,9 @@ const userSchema = new Schema({
     type: Number,
     default: 400,
   },
+  state: {
+    type: Boolean,
+  },
   friends: [
     {
       type: Schema.Types.ObjectId,

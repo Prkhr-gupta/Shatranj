@@ -45,7 +45,10 @@
   <div>
     <div class="text-white">Computer</div>
     <div id="myBoard" style="width: 460px"></div>
-    <div class="text-white">Player 1</div>
+    <div class="text-white">
+      <% if(!currUser) { %> Guest <% } %> <% if(currUser) { %> <%=
+      currUser.username %> <% } %>
+    </div>
   </div>
   <div
     class="bg-neutral-900 w-1/4 flex flex-col justify-center items-center rounded-3xl"
@@ -82,3 +85,18 @@
 <script src="assets/js/chessboard-1.0.0.min.js"></script>
 <script src="assets/js/chess-0.10.3.min.js"></script>
 <script src="assets/js/computer.js" type="module"></script>
+<script>
+  let user = "guest";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
+</script>

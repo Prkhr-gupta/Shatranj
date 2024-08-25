@@ -38,3 +38,18 @@
 
   window.setTimeout(makeRandomMove, 500);
 </script>
+<script>
+  let user = "guest";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
+</script>

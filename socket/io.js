@@ -1,3 +1,5 @@
+const User = require("../models/user.js");
+const Chat = require("../models/chat.js");
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = (io) => {
@@ -125,6 +127,30 @@ module.exports = (io) => {
     socket.on("new message", (mode, roomId, text, color) => {
       games[mode][roomId].chats.push({ text, color });
       socket.broadcast.to(roomId).emit("msg recieved", text);
+    });
+
+    socket.on("private message", async (to, text, from) => {
+      console.log("message at server from", from, "to", to);
+      io.to(to).emit("msg recieved", text, from);
+      let newChat = new Chat({
+        message: text,
+        from: from,
+        to: to,
+        time: new Date(),
+      });
+      await newChat.save();
+    });
+
+    socket.on("userConnect", async (username) => {
+      socket.join(username);
+      console.log(username, "connected");
+      socket.privateRoom = username;
+      await User.updateOne({ username: username }, { $set: { state: true } });
+    });
+
+    socket.on("disconnect", async () => {
+      let username = socket.privateRoom;
+      await User.updateOne({ username: username }, { $set: { state: false } });
     });
   });
 };

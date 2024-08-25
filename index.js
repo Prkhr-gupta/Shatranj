@@ -7,12 +7,15 @@ const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const myIo = require("./socket/io.js");
 const session = require("express-session");
+const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const Match = require("./models/match.js");
 const User = require("./models/user.js");
+const Chat = require("./models/chat.js");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
+const { isLoggedIn, saveRedirectUrl } = require("./middleware.js");
 
 const app = express();
 const server = createServer(app);
@@ -53,6 +56,7 @@ const sessionOptions = {
 };
 
 app.use(session(sessionOptions));
+app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -60,6 +64,13 @@ passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
+  next();
+});
 
 app.get("/", (req, res) => {
   res.render("pages/home.ejs");
@@ -102,24 +113,110 @@ app.get("/computer", (req, res) => {
   res.render("pages/computer");
 });
 
-app.get("/online", (req, res) => {
+app.get("/online", isLoggedIn, (req, res) => {
   res.render("pages/bullet.ejs");
+});
+
+app.get("/friends", isLoggedIn, async (req, res) => {
+  let username = req.user.username;
+  let currUser = await User.findOne({ username: `${username}` }).populate(
+    "friends"
+  );
+  res.render("pages/friends.ejs", { currUser });
+});
+
+app.get("/user/find/:username", async (req, res) => {
+  let { username } = req.params;
+  let user = await User.findOne({ username: `${username}` });
+  res.send(user);
+});
+
+app.get("/user/chats/:username/:friend", async (req, res) => {
+  let { username, friend } = req.params;
+  console.log(username, friend);
+  let chats = await Chat.find({
+    $or: [
+      { from: username, to: friend },
+      { from: friend, to: username },
+    ],
+  });
+  await Chat.updateMany(
+    { from: friend, to: username },
+    { $set: { isRead: true } }
+  );
+  res.send(chats);
+});
+
+app.get("/user/unread/:username/:friend", async (req, res) => {
+  let { username, friend } = req.params;
+  let unReadCnt = await Chat.countDocuments({
+    from: friend,
+    to: username,
+    isRead: false,
+  });
+  res.send(`${unReadCnt}`);
+});
+
+app.get("/user/unread/:username", async (req, res) => {
+  let { username, friend } = req.params;
+  let unReadCnt = await Chat.countDocuments({
+    to: username,
+    isRead: false,
+  });
+  res.send(`${unReadCnt}`);
 });
 
 app.get("/signup", (req, res) => {
   res.render("pages/signup.ejs");
 });
 
-app.post("/signup", (req, res) => {
-  res.send("ok");
-});
+app.post(
+  "/signup",
+  wrapAsync(async (req, res) => {
+    try {
+      let { username, email, password } = req.body;
+      const newUser = new User({ email, username });
+      const registeredUser = await User.register(newUser, password);
+      req.login(registeredUser, (err) => {
+        if (err) {
+          return next(err);
+        }
+        req.flash("success", "Welcome to Shatranj, play chess online!");
+        res.redirect("/");
+      });
+    } catch (err) {
+      req.flash("error", `${err.message}!`);
+      res.redirect("/signup");
+    }
+  })
+);
 
 app.get("/login", (req, res) => {
   res.render("pages/login.ejs");
 });
 
-app.post("/login", (req, res) => {
-  res.send("ok");
+app.post(
+  "/login",
+  saveRedirectUrl,
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  (req, res) => {
+    req.flash("success", "Log in successful!");
+    let redirectUrl = res.locals.redirectUrl || "/";
+    res.redirect(redirectUrl);
+  }
+);
+
+app.get("/logout", (req, res, next) => {
+  req.logOut((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.flash("success", "You are logged out!");
+    res.redirect("/");
+  });
 });
 
 app.all("*", (req, res, next) => {
