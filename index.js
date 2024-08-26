@@ -141,10 +141,19 @@ app.get("/user/chats/:username/:friend", async (req, res) => {
     ],
   });
   await Chat.updateMany(
-    { from: friend, to: username },
+    { from: friend, to: username, isRead: false },
     { $set: { isRead: true } }
   );
   res.send(chats);
+});
+
+app.get("/user/read/:username/:friend", async (req, res) => {
+  let { username, friend } = req.params;
+  await Chat.updateMany(
+    { from: friend, to: username, isRead: false },
+    { $set: { isRead: true } }
+  );
+  res.send("null");
 });
 
 app.get("/user/unread/:username/:friend", async (req, res) => {

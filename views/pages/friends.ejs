@@ -29,31 +29,51 @@
       <div class="text-white">
         <div class="text-5xl mb-4 text-center">
           Your Friends
-          <button
-            class="h-full flex items-center text-2xl float-right mr-16 mt-3"
-          >
-            <i class="fa-solid fa-user-plus"></i>
-          </button>
+          <div class="inline btn-group dropup float-right mr-16 mt-3">
+            <button
+              class="h-full flex items-center relative"
+              id="dropdownMenuClickableInside"
+              data-bs-toggle="dropdown"
+              data-bs-auto-close="outside"
+            >
+              <i class="fa-solid fa-user-plus text-2xl"></i>
+              <span
+                class="text-sm position-absolute top-0 start-100 translate-middle badge rounded-full bg-danger hidden"
+                id="badgeReq"
+              >
+                0
+              </span>
+            </button>
+            <ul
+              class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
+              id="friendRequests"
+              aria-labelledby="dropdownMenuButton1"
+            >
+              <li class="dropdown-item">No Friend Requests</li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div class="flex flex-col items-center overflow-y-auto h-4/6">
+      <div
+        class="flex flex-col items-center overflow-y-auto h-4/6"
+        id="allFriends"
+      >
         <% for(let friend of currUser.friends) { %>
         <div
-          class="w-11/12 h-16 text-white mx-4 my-2 border-2 border-neutral-800 rounded-md flex justify-between"
+          class="w-11/12 text-white mx-4 my-2 border-2 border-neutral-800 rounded-md flex justify-between"
+          id="<%= friend.username %>friend"
         >
-          <div class="h-full w-full rounded-l-md">
-            <button
-              class="h-full w-full rounded-l-md text-left pl-4 hover:bg-neutral-800"
-            >
+          <div class="h-full w-full rounded-l-md p-3 hover:bg-neutral-800">
+            <button class="h-full w-full rounded-l-md text-left pl-4">
               <i class="fa-regular fa-user mr-2"></i><%= friend.username %> (<%=
               friend.rating %>)
             </button>
           </div>
-          <div>
+          <div class="flex">
             <button
               type="button"
-              class="relative text-black bg-neutral-200 hover:bg-neutral-400 active:bg-neutral-500 h-full w-32 rounded-r-md rounded-l-none msgBtn"
+              class="relative text-black bg-neutral-200 hover:bg-neutral-400 active:bg-neutral-500 h-full w-32 msgBtn"
               id="<%= friend.username %>"
             >
               <i class="fa-regular fa-message mr-2"></i>
@@ -63,6 +83,12 @@
                 class="position-absolute top-0 start-100 translate-middle badge rounded-full bg-danger"
                 >0</span
               >
+            </button>
+            <button
+              class="w-12 bg-rose-800 rounded-r-md removeFriend"
+              id="<%= friend.username %>"
+            >
+              <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         </div>
@@ -164,57 +190,201 @@
   let send = document.getElementById("sendMsg");
   let text = document.getElementById("text");
   let currChat = document.getElementById("currChat");
-  serachUser.addEventListener("click", () => {
-    if (addFriend.value != "") {
-      xhr.open("GET", `user/find/${addFriend.value}`, true);
-      xhr.onprogress = () => {
-        loading.style.display = "flex";
-      };
-      xhr.onload = () => {
-        loading.style.display = "none";
-        let data = xhr.responseText;
-        addFriend.value = "";
-        if (!data) {
+  let friendRequests = document.getElementById("friendRequests");
+  let badgeReq = document.getElementById("badgeReq");
+  let allFriends = document.getElementById("allFriends");
+  let friends = [];
+  let removeFriendBtns = document.querySelectorAll(".removeFriend");
+  let notifySound = new Audio("./assets/sounds/notify.mp3");
+
+  function search() {
+    xhr.open("GET", `user/find/${addFriend.value}`, true);
+    xhr.onprogress = () => {
+      loading.style.display = "flex";
+    };
+    xhr.onload = () => {
+      loading.style.display = "none";
+      let data = xhr.responseText;
+      addFriend.value = "";
+      if (!data) {
+        Swal.fire({
+          title: "User Not Found!",
+          icon: "error",
+          color: "#fff",
+          background: "rgb(28, 28, 34)",
+        });
+      } else {
+        let user = JSON.parse(data);
+        let flag = false;
+        console.log(friends);
+        for (let friend of friends) {
+          if (user.username == friend) {
+            flag = true;
+          }
+        }
+        if (user.username == "<%= currUser.username %>") {
           Swal.fire({
-            title: "User Not Found!",
+            text: "Cannot add yourself as friend!",
             icon: "error",
             color: "#fff",
             background: "rgb(28, 28, 34)",
           });
+        } else if (flag) {
+          Swal.fire({
+            text: `${user.username} is your friend already`,
+            icon: "info",
+            color: "#fff",
+            background: "rgb(28, 28, 34)",
+          });
         } else {
-          let user = JSON.parse(data);
-          if (user.username == "<%= currUser.username %>") {
-            Swal.fire({
-              text: "Cannot add yourself as friend!",
-              icon: "error",
-              color: "#fff",
-              background: "rgb(28, 28, 34)",
-            });
-          } else {
-            Swal.fire({
-              title: user.username,
-              text: `Current Rating : ${user.rating}`,
-              showDenyButton: true,
-              confirmButtonText: "Send Friend Request",
-              denyButtonText: "Cancel",
-              icon: "info",
-              color: "#fff",
-              background: "rgb(28, 28, 34)",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // add toast
-                socket.emit(
-                  "friend request",
-                  "<%= currUser.username %>",
-                  user.username
-                );
-              }
-            });
-          }
+          Swal.fire({
+            title: user.username,
+            text: `Current Rating : ${user.rating}`,
+            showDenyButton: true,
+            confirmButtonText: "Send Friend Request",
+            denyButtonText: "Cancel",
+            icon: "info",
+            color: "#fff",
+            background: "rgb(28, 28, 34)",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // add toast
+
+              socket.emit(
+                "friend request",
+                "<%= currUser.username %>",
+                user.username
+              );
+            }
+          });
         }
-      };
-      xhr.send();
+      }
+    };
+    xhr.send();
+  }
+
+  serachUser.addEventListener("click", () => {
+    if (addFriend.value != "") {
+      search();
     }
+  });
+
+  addFriend.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && addFriend.value != "") {
+      search();
+    }
+  });
+
+  function createReq(from) {
+    let li = document.createElement("li");
+    let span = document.createElement("span");
+    let btn1 = document.createElement("button");
+    let btn2 = document.createElement("button");
+    span.innerText = `${from} sent you a friend request`;
+    btn1.innerText = "Accept";
+    btn2.innerText = "Decline";
+    btn1.style.backgroundColor = "rgb(229 229 229)";
+    btn2.style.backgroundColor = "rgb(165, 43, 43)";
+    btn1.style.color = "black";
+    btn2.style.color = "white";
+    btn1.style.padding = "0.5rem";
+    btn2.style.padding = "0.5rem";
+    btn1.style.margin = "0.5rem";
+    btn2.style.margin = "0.5rem";
+    btn1.id = `${from}`;
+    btn1.addEventListener("click", () => {
+      badgeReq.innerText = parseInt(badgeReq.innerText) - 1;
+      if (parseInt(badgeReq.innerText) == 0) {
+        badgeReq.style.display = "none";
+      }
+      socket.emit("accepted", btn1.id, `<%= currUser.username %>`);
+      li.remove();
+    });
+    btn2.addEventListener("click", () => {
+      badgeReq.innerText = parseInt(badgeReq.innerText) - 1;
+      if (parseInt(badgeReq.innerText) == 0) {
+        badgeReq.style.display = "none";
+      }
+      socket.emit("declined", btn1.id, `<%= currUser.username %>`);
+      li.remove();
+    });
+    li.appendChild(span);
+    li.appendChild(btn1);
+    li.appendChild(btn2);
+    // li.style.width = "18rem";
+    li.classList.add("dropdown-item");
+    friendRequests.appendChild(li);
+  }
+
+  let requests = "<%= currUser.requests %>".split(",");
+  // console.log(requests);
+  let cntReq = 0;
+  for (let req of requests) {
+    if (req != "") {
+      cntReq++;
+      createReq(req);
+    }
+  }
+  if (cntReq > 0) {
+    badgeReq.style.display = "block";
+    badgeReq.innerText = cntReq;
+  }
+
+  socket.on("friend request", (from) => {
+    notifySound.play();
+    createReq(from);
+    badgeReq.style.display = "block";
+    badgeReq.innerText = parseInt(badgeReq.innerText) + 1;
+  });
+
+  socket.on("accepted", (friend, rating) => {
+    friends.push(friend);
+    let div = document.createElement("div");
+    div.innerHTML = `
+          <div class="h-full w-full p-3 rounded-l-md">
+            <button
+              class="h-full w-full rounded-l-md text-left pl-4 hover:bg-neutral-800"
+            >
+              <i class="fa-regular fa-user mr-2"></i>${friend}(${rating})
+            </button>
+          </div>
+          <div class="flex">
+            <button
+              type="button"
+              class="relative text-black bg-neutral-200 hover:bg-neutral-400 active:bg-neutral-500 h-full w-32 msgBtn"
+              id="${friend}"
+              onclick = "msgFunc('${friend}')"
+            >
+              <i class="fa-regular fa-message mr-2"></i>
+              Message
+              <span
+                id="${friend}badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-full bg-danger hidden"
+                >0</span
+              >
+            </button>
+            <button 
+              class="w-12 bg-rose-800 rounded-r-md removeFriend" 
+              id="${friend}"
+              onclick = "removeFriend('${friend}')"
+            >
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+    div.classList.add(
+      "w-11/12",
+      "text-white",
+      "mx-4",
+      "my-2",
+      "border-2",
+      "border-neutral-800",
+      "rounded-md",
+      "flex",
+      "justify-between"
+    );
+    div.id = `${friend}friend`;
+    allFriends.prepend(div);
   });
 
   function createMsg(text, pos) {
@@ -260,7 +430,7 @@
       return;
     }
   });
-  text.addEventListener("keypress", (event) => {
+  text.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && currChat.innerText !== "") {
       createMsg(text.value, "self-end");
       socket.emit(
@@ -277,7 +447,33 @@
     }
   });
 
+  function msgFunc(msgBtnId) {
+    if (msgBtnId === currChat.innerText) return;
+    currChat.innerText = msgBtnId;
+    let badgeId = document.getElementById(`${msgBtnId}badge`);
+    console.log(badgeId);
+    badgeId.style.display = "none";
+    let read = parseInt(badgeId.innerText);
+    badge.innerText = parseInt(badge.innerText) - read;
+    if (parseInt(badge.innerText) == 0) badge.style.display = "none";
+    badgeId.innerText = 0;
+    xhr.open("GET", `user/chats/<%= currUser.username %>/${msgBtnId}`, false);
+    xhr.onload = () => {
+      let chats = JSON.parse(xhr.responseText);
+      // console.log("the chats");
+      msgBox.replaceChildren();
+      for (let chat of chats) {
+        // console.log(chat.message);
+        if (chat.from == "<%= currUser.username %>")
+          createMsg(chat.message, "self-end");
+        else createMsg(chat.message, "self-start");
+      }
+    };
+    xhr.send();
+  }
+
   for (let msgBtn of msgBtns) {
+    friends.push(msgBtn.id);
     xhr.open("GET", `user/unread/<%= currUser.username %>/${msgBtn.id}`, false);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
@@ -286,38 +482,60 @@
       else badge.style.display = "none";
     };
     xhr.send();
-    msgBtn.addEventListener("click", (event) => {
-      let username = event.target.id;
-      xhr.open("GET", `user/chats/<%= currUser.username %>/${username}`, true);
-      if (username === currChat.innerText) return;
-      currChat.innerText = username;
-      let badgeId = document.getElementById(`${msgBtn.id}badge`);
-      badgeId.style.display = "none";
-      let read = parseInt(badgeId.innerText);
-      badge.innerText = parseInt(badge.innerText) - read;
-      if (parseInt(badge.innerText) == 0) badge.style.display = "none";
-      badgeId.innerText = 0;
-      xhr.onload = () => {
-        let chats = JSON.parse(xhr.responseText);
-        // console.log("the chats");
-        msgBox.replaceChildren();
-        for (let chat of chats) {
-          // console.log(chat.message);
-          if (chat.from == "<%= currUser.username %>")
-            createMsg(chat.message, "self-end");
-          else createMsg(chat.message, "self-start");
-        }
-      };
-      xhr.send();
+    msgBtn.addEventListener("click", () => {
+      msgFunc(msgBtn.id);
     });
   }
+
+  function removeFriend(friend) {
+    Swal.fire({
+      text: `Remove ${friend} from friends`,
+      showDenyButton: true,
+      confirmButtonText: "Remove",
+      denyButtonText: "Cancel",
+      icon: "warning",
+      color: "#fff",
+      background: "rgb(28, 28, 34)",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let enemy = document.getElementById(`${friend}friend`);
+        allFriends.removeChild(enemy);
+        let index = friends.indexOf(`${friend}`);
+        if (index > -1) {
+          friends.splice(index, 1);
+        }
+        console.log(friends);
+        socket.emit("removed", "<%= currUser.username %>", friend);
+      }
+    });
+  }
+
+  socket.on("removed", (friend) => {
+    let enemy = document.getElementById(`${friend}friend`);
+    allFriends.removeChild(enemy);
+    let index = friends.indexOf(`${friend}`);
+    if (index > -1) {
+      friends.splice(index, 1);
+    }
+    console.log(friends);
+  });
+
+  for (let removeFriendBtn of removeFriendBtns) {
+    removeFriendBtn.addEventListener("click", () => {
+      removeFriend(removeFriendBtn.id);
+    });
+  }
+
   socket.on("msg recieved", (text, from) => {
-    // notifySound.play();
+    notifySound.play();
     if (currChat.innerText != from) {
       let badgeId = document.getElementById(`${from}badge`);
       badgeId.style.display = "block";
       badgeId.innerText = parseInt(badgeId.innerText) + 1;
     } else {
+      xhr.open("GET", `user/read/<%= currUser.username %>/${from}`, false);
+      xhr.onload = () => {};
+      xhr.send();
       createMsg(text, "self-start");
       badge.innerText = parseInt(badge.innerText) - 1;
       if (parseInt(badge.innerText) == 0) badge.style.display = "none";

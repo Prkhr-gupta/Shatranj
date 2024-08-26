@@ -130,15 +130,61 @@ module.exports = (io) => {
     });
 
     socket.on("private message", async (to, text, from) => {
-      console.log("message at server from", from, "to", to);
-      io.to(to).emit("msg recieved", text, from);
       let newChat = new Chat({
         message: text,
         from: from,
         to: to,
         time: new Date(),
+        isRead: false,
       });
       await newChat.save();
+      io.to(to).emit("msg recieved", text, from);
+    });
+
+    socket.on("friend request", async (from, to) => {
+      await User.updateOne({ username: to }, { $push: { requests: from } });
+      io.to(to).emit("friend request", from);
+    });
+
+    socket.on("accepted", async (username1, username2) => {
+      let user1 = await User.findOne({ username: username1 });
+      let user2 = await User.findOne({ username: username2 });
+      await User.updateOne(
+        { username: username1 },
+        { $push: { friends: user2 } }
+      );
+      await User.updateOne(
+        { username: username2 },
+        { $push: { friends: user1 } }
+      );
+      await User.updateOne(
+        { username: username2 },
+        { $pull: { requests: username1 } }
+      );
+      io.to(username1).emit("accepted", username2, user2.rating);
+      io.to(username2).emit("accepted", username1, user1.rating);
+    });
+
+    socket.on("declined", async (username1, username2) => {
+      console.log(username1);
+      await User.updateOne(
+        { username: username2 },
+        { $pull: { requests: username1 } }
+      );
+    });
+
+    socket.on("removed", async (user, friend) => {
+      let user1 = await User.findOne({ username: user });
+      let user2 = await User.findOne({ username: friend });
+      await User.updateOne(
+        { username: user },
+        { $pull: { friends: user2._id } }
+      );
+      await User.updateOne(
+        { username: friend },
+        { $pull: { friends: user1._id } }
+      );
+      io.to(friend).emit("removed", user);
     });
 
     socket.on("userConnect", async (username) => {

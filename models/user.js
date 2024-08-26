@@ -21,6 +21,7 @@ const userSchema = new Schema({
       ref: "User",
     },
   ],
+  requests: [String],
   matches: [
     {
       type: Schema.Types.ObjectId,
