@@ -15,6 +15,10 @@ const userSchema = new Schema({
   state: {
     type: Boolean,
   },
+  isPlaying: {
+    type: Boolean,
+    default: false,
+  },
   friends: [
     {
       type: Schema.Types.ObjectId,

@@ -13,26 +13,42 @@ module.exports = (io) => {
     blitz: {},
     rapid: {},
   };
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     console.log("New socket connection");
-    socket.on("create room", (mode) => {
-      if (rooms[mode].length == 0) {
-        let roomId = uuidv4();
-        let color = "white";
-        rooms[mode].push(roomId);
-        io.to(socket.id).emit("room id", roomId, color);
-      } else {
-        let color = "black";
-        io.to(socket.id).emit("room id", rooms[mode][0], color);
-        rooms[mode].pop();
-      }
-    });
-
     function timeout(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    socket.on("join room", (mode, roomId, color) => {
+    socket.on("create private room", async (mode, user1, user2, color) => {
+      await User.updateOne({ username: user1 }, { isPlaying: true });
+      await User.updateOne({ username: user2 }, { isPlaying: true });
+      let roomId = uuidv4();
+      if (color == "random") {
+        let random = Math.floor(Math.random() * 2 + 1);
+        if (random == 1) color = "white";
+        else color = "black";
+      }
+      let opponentColor = "white";
+      if (color == "white") opponentColor = "black";
+      io.to(user1).emit("room id", mode, roomId, color);
+      io.to(user2).emit("room id", mode, roomId, opponentColor);
+    });
+
+    socket.on("create room", async (mode, username) => {
+      await User.updateOne({ username: username }, { isPlaying: true });
+      if (rooms[mode].length == 0) {
+        let roomId = uuidv4();
+        let color = "white";
+        rooms[mode].push(roomId);
+        io.to(socket.id).emit("room id", mode, roomId, color);
+      } else {
+        let color = "black";
+        io.to(socket.id).emit("room id", mode, rooms[mode][0], color);
+        rooms[mode].pop();
+      }
+    });
+
+    socket.on("join room", (mode, roomId, color, username) => {
       socket.join(roomId);
       if (typeof games[mode][roomId] === "undefined") {
         games[mode][roomId] = {
@@ -40,6 +56,8 @@ module.exports = (io) => {
           history: [],
           verbose: [],
           lastMoveColor: "black",
+          player1: `${username}`,
+          player2: "",
           player1Color: `${color}`,
           player2Color: "",
           gameHasStarted: false,
@@ -52,6 +70,7 @@ module.exports = (io) => {
       } else {
         if (color !== games[mode][roomId].player1Color) {
           if (!games[mode][roomId].gameHasStarted) {
+            games[mode][roomId].player2 = `${username}`;
             games[mode][roomId].player2Color = `${color}`;
             let timeControl =
               mode === "bullet" ? 30 : mode === "blitz" ? 180 : 600;
@@ -83,7 +102,15 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("game over", (mode, roomId) => {
+    socket.on("game over", async (mode, roomId) => {
+      await User.updateOne(
+        { username: games[mode][roomId].player1 },
+        { isPlaying: false }
+      );
+      await User.updateOne(
+        { username: games[mode][roomId].player2 },
+        { isPlaying: false }
+      );
       games[mode][roomId].gameOver = true;
     });
 
@@ -124,9 +151,30 @@ module.exports = (io) => {
       io.to(roomId).emit("rematch accepted", nwRoomId);
     });
 
+    socket.on("challenge", async (user, opponent, gamemode, color) => {
+      let user1 = await User.findOne({ username: user });
+      let user2 = await User.findOne({ username: opponent });
+      console.log("challenger color : ", color);
+      if (user2.isPlaying == true) {
+        io.to(user).emit("challenge failed", opponent);
+      } else if (user1.isPlaying == true) {
+        io.to(user).emit("challenge failed", user);
+      } else {
+        let opponentColor = "random";
+        if (color == "white") opponentColor = "black";
+        if (color == "black") opponentColor = "white";
+        console.log("opponent color : ", opponentColor);
+        io.to(opponent).emit("challenge", user, gamemode, opponentColor);
+      }
+    });
+
+    socket.on("challenge declined", (user, opponent) => {
+      io.to(user).emit("challenge declined", opponent);
+    });
+
     socket.on("new message", (mode, roomId, text, color) => {
       games[mode][roomId].chats.push({ text, color });
-      socket.broadcast.to(roomId).emit("msg recieved", text);
+      socket.broadcast.to(roomId).emit("live msg recieved", text);
     });
 
     socket.on("private message", async (to, text, from) => {
@@ -161,8 +209,8 @@ module.exports = (io) => {
         { username: username2 },
         { $pull: { requests: username1 } }
       );
-      io.to(username1).emit("accepted", username2, user2.rating);
-      io.to(username2).emit("accepted", username1, user1.rating);
+      io.to(username1).emit("accepted", username2, user2.rating, user2.state);
+      io.to(username2).emit("accepted", username1, user1.rating, user1.state);
     });
 
     socket.on("declined", async (username1, username2) => {
@@ -191,12 +239,27 @@ module.exports = (io) => {
       socket.join(username);
       console.log(username, "connected");
       socket.privateRoom = username;
-      await User.updateOne({ username: username }, { $set: { state: true } });
+      let user = await User.findOneAndUpdate(
+        { username: username },
+        { $set: { state: true } }
+      ).populate("friends");
+      for (let friend of user.friends) {
+        io.to(friend.username).emit("friend connected", username);
+      }
     });
 
     socket.on("disconnect", async () => {
       let username = socket.privateRoom;
-      await User.updateOne({ username: username }, { $set: { state: false } });
+      console.log(username, "disconnected");
+      let user = await User.findOneAndUpdate(
+        { username: username },
+        { $set: { state: false } }
+      ).populate("friends");
+      if (user) {
+        for (let friend of user.friends) {
+          io.to(friend.username).emit("friend disconnected", username);
+        }
+      }
     });
   });
 };

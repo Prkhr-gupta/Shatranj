@@ -102,4 +102,28 @@
     badge.style.display = "block";
     badge.innerText = parseInt(badge.innerText) + 1;
   });
+
+  socket.on("room id", (mode, roomId, color) => {
+    window.location.replace(
+      `/online?mode=${mode}&roomId=${roomId}&color=${color}`
+    );
+  });
+
+  socket.on("challenge", (opponent, gamemode, color) => {
+    Swal.fire({
+      title: `${opponent} sent you a challenge`,
+      showDenyButton: true,
+      confirmButtonText: "Accept",
+      denyButtonText: "Decline",
+      icon: "question",
+      color: "#fff",
+      background: "rgb(28, 28, 34)",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        socket.emit("create private room", gamemode, user, opponent, color);
+      } else {
+        socket.emit("challenge declined", opponent, user);
+      }
+    });
+  });
 </script>

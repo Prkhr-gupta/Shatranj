@@ -114,28 +114,13 @@
     }
   });
   bullet.addEventListener("click", () => {
-    socket.emit("create room", "bullet");
-    socket.on("room id", (roomId, color) => {
-      window.location.replace(
-        `/online?mode=bullet&roomId=${roomId}&color=${color}`
-      );
-    });
+    socket.emit("create room", "bullet", user);
   });
   blitz.addEventListener("click", () => {
-    socket.emit("create room", "blitz");
-    socket.on("room id", (roomId, color) => {
-      window.location.replace(
-        `/online?mode=blitz&roomId=${roomId}&color=${color}`
-      );
-    });
+    socket.emit("create room", "blitz", user);
   });
   rapid.addEventListener("click", () => {
-    socket.emit("create room", "rapid");
-    socket.on("room id", (roomId, color) => {
-      window.location.replace(
-        `/online?mode=rapid&roomId=${roomId}&color=${color}`
-      );
-    });
+    socket.emit("create room", "rapid", user);
   });
 </script>
 <script>

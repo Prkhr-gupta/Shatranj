@@ -49,7 +49,7 @@
               id="friendRequests"
               aria-labelledby="dropdownMenuButton1"
             >
-              <li class="dropdown-item">No Friend Requests</li>
+              <li class="dropdown-item" id="noFriends">No Friend Requests</li>
             </ul>
           </div>
         </div>
@@ -64,10 +64,23 @@
           class="w-11/12 text-white mx-4 my-2 border-2 border-neutral-800 rounded-md flex justify-between"
           id="<%= friend.username %>friend"
         >
-          <div class="h-full w-full rounded-l-md p-3 hover:bg-neutral-800">
-            <button class="h-full w-full rounded-l-md text-left pl-4">
-              <i class="fa-regular fa-user mr-2"></i><%= friend.username %> (<%=
-              friend.rating %>)
+          <div
+            class="h-full w-full rounded-l-md p-3 hover:bg-neutral-800 selectFriend cursor-pointer"
+            id="<%= friend.username %>"
+          >
+            <button
+              class="h-full w-full rounded-l-md text-left pl-4 flex items-center"
+            >
+              <i class="fa-regular fa-user mr-2"></i>
+              <div><%= friend.username %> (<%= friend.rating %>)</div>
+              <div
+              <% if(friend.state === false) { %> style="display: none;" <% } %>
+                class="ml-4 w-4 h-4 rounded-full bg-lime-600"
+                
+                id="<%= friend.username %>state"
+          
+              >
+              </div>
             </button>
           </div>
           <div class="flex">
@@ -97,52 +110,112 @@
     </div>
   </div>
   <div class="w-4/12 bg-neutral-900 m-3 rounded-t-2xl">
-    <div class="h-1/2">
+    <form class="h-1/2" id="createChallengeForm">
       <div class="h-2/3 flex mt-3">
         <div class="w-full h-full">
           <div class="text-white text-center text-2xl h-12 pt-1">Gamemode</div>
           <div id="modes" class="text-center bg-neutral-900 h-2/3 w-full">
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+            <input
+              type="radio"
+              id="bulletRadio"
+              name="gamemode"
+              class="hidden peer/bullet"
+              value="bullet"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/bullet:border-2 border-rose-800"
               id="bullet"
+              for="bulletRadio"
             >
-              <i class="fa-regular fa-hourglass mr-2"></i>Bullet 1|1
-            </button>
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-regular fa-hourglass mr-2"></i>Bullet 1|1
+              </div>
+            </label>
+            <input
+              type="radio"
+              id="blitzRadio"
+              name="gamemode"
+              class="hidden peer/blitz"
+              value="blitz"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/blitz:border-2 border-rose-800"
               id="blitz"
+              for="blitzRadio"
             >
-              <i class="fa-solid fa-bolt mr-2"></i>Blitz 3|2
-            </button>
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-solid fa-bolt mr-2"></i>Blitz 3|2
+              </div>
+            </label>
+            <input
+              type="radio"
+              id="rapidRadio"
+              name="gamemode"
+              class="hidden peer/rapid"
+              value="rapid"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/rapid:border-2 border-rose-800"
               id="rapid"
+              for="rapidRadio"
             >
-              <i class="fa-solid fa-clock mr-2"></i>Rapid 10|0
-            </button>
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-solid fa-clock mr-2"></i>Rapid 10|0
+              </div>
+            </label>
           </div>
         </div>
         <div class="w-full h-full">
           <div class="text-white text-center text-2xl h-12 pt-1">Play as</div>
           <div id="color" class="text-center bg-neutral-900 h-2/3 w-full">
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+            <input
+              type="radio"
+              id="whiteRadio"
+              name="playAs"
+              class="hidden peer/white"
+              value="white"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/white:border-2 border-rose-800"
               id="white"
+              for="whiteRadio"
             >
-              <i class="fa-regular fa-chess-queen mr-2"></i>White
-            </button>
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-regular fa-chess-queen mr-2"></i>White
+              </div>
+            </label>
+            <input
+              type="radio"
+              id="blackRadio"
+              name="playAs"
+              class="hidden peer/black"
+              value="black"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/black:border-2 border-rose-800"
               id="black"
+              for="blackRadio"
             >
-              <i class="fa-solid fa-chess-queen mr-2"></i>Black
-            </button>
-            <button
-              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8"
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-solid fa-chess-queen mr-2"></i>Black
+              </div>
+            </label>
+            <input
+              type="radio"
+              id="randomRadio"
+              name="playAs"
+              class="hidden peer/random"
+              value="random"
+            />
+            <label
+              class="bg-neutral-200 hover:bg-neutral-400 my-1 rounded-2xl w-3/4 h-8 peer-checked/random:border-2 border-rose-800"
               id="random"
+              for="randomRadio"
             >
-              <i class="fa-solid fa-shuffle mr-2"></i>Random
-            </button>
+              <div class="h-full flex justify-center items-center">
+                <i class="fa-solid fa-shuffle mr-2"></i>Random
+              </div>
+            </label>
           </div>
         </div>
       </div>
@@ -150,10 +223,11 @@
         <button
           class="h-full w-10/12 text-white rounded-2xl bg-lime-700 hover:bg-lime-600 active:bg-lime-500 text-2xl font-bold"
         >
-          <i class="fa-brands fa-delicious mr-2"></i>Challenge
+          <div><i class="fa-brands fa-delicious mr-2"></i>Challenge</div>
+          <div class="text-xs" id="selectedFriend">(Select a friend)</div>
         </button>
       </div>
-    </div>
+    </form>
     <div class="h-1/2 border-t flex flex-col">
       <div id="currChat" class="text-white text-center"></div>
       <div class="h-full overflow-y-scroll flex flex-col" id="msgBox"></div>
@@ -196,6 +270,11 @@
   let friends = [];
   let removeFriendBtns = document.querySelectorAll(".removeFriend");
   let notifySound = new Audio("./assets/sounds/notify.mp3");
+  let noFriends = document.getElementById("noFriends");
+  let selectFriendBtns = document.querySelectorAll(".selectFriend");
+  let selectedFriend = document.getElementById("selectedFriend");
+  let createChallengeForm = document.getElementById("createChallengeForm");
+  let sendChallenge = true;
 
   function search() {
     xhr.open("GET", `user/find/${addFriend.value}`, true);
@@ -207,34 +286,27 @@
       let data = xhr.responseText;
       addFriend.value = "";
       if (!data) {
-        Swal.fire({
-          title: "User Not Found!",
+        Toast.fire({
           icon: "error",
-          color: "#fff",
-          background: "rgb(28, 28, 34)",
+          title: "User Not Found!"
         });
       } else {
         let user = JSON.parse(data);
         let flag = false;
-        console.log(friends);
         for (let friend of friends) {
           if (user.username == friend) {
             flag = true;
           }
         }
         if (user.username == "<%= currUser.username %>") {
-          Swal.fire({
-            text: "Cannot add yourself as friend!",
+          Toast.fire({
             icon: "error",
-            color: "#fff",
-            background: "rgb(28, 28, 34)",
+            title: "Cannot add yourself as friend!"
           });
         } else if (flag) {
-          Swal.fire({
-            text: `${user.username} is your friend already`,
-            icon: "info",
-            color: "#fff",
-            background: "rgb(28, 28, 34)",
+          Toast.fire({
+            icon: "error",
+            title: `${user.username} is your friend already`,
           });
         } else {
           Swal.fire({
@@ -248,8 +320,10 @@
             background: "rgb(28, 28, 34)",
           }).then((result) => {
             if (result.isConfirmed) {
-              // add toast
-
+              Toast.fire({
+                icon: "success",
+                title: "Friend request sent!"
+              });
               socket.emit(
                 "friend request",
                 "<%= currUser.username %>",
@@ -291,10 +365,13 @@
     btn2.style.padding = "0.5rem";
     btn1.style.margin = "0.5rem";
     btn2.style.margin = "0.5rem";
+    btn1.style.borderRadius = "0.5rem";
+    btn2.style.borderRadius = "0.5rem";
     btn1.id = `${from}`;
     btn1.addEventListener("click", () => {
       badgeReq.innerText = parseInt(badgeReq.innerText) - 1;
       if (parseInt(badgeReq.innerText) == 0) {
+        noFriends.style.display = "block";
         badgeReq.style.display = "none";
       }
       socket.emit("accepted", btn1.id, `<%= currUser.username %>`);
@@ -303,6 +380,7 @@
     btn2.addEventListener("click", () => {
       badgeReq.innerText = parseInt(badgeReq.innerText) - 1;
       if (parseInt(badgeReq.innerText) == 0) {
+        noFriends.style.display = "block";
         badgeReq.style.display = "none";
       }
       socket.emit("declined", btn1.id, `<%= currUser.username %>`);
@@ -326,6 +404,7 @@
     }
   }
   if (cntReq > 0) {
+    noFriends.style.display = "none";
     badgeReq.style.display = "block";
     badgeReq.innerText = cntReq;
   }
@@ -333,19 +412,30 @@
   socket.on("friend request", (from) => {
     notifySound.play();
     createReq(from);
+    noFriends.style.display = "none";
     badgeReq.style.display = "block";
     badgeReq.innerText = parseInt(badgeReq.innerText) + 1;
   });
 
-  socket.on("accepted", (friend, rating) => {
+  socket.on("accepted", (friend, rating, state) => {
     friends.push(friend);
+    let hide = "hidden";
+    if (state) hide = "";
     let div = document.createElement("div");
     div.innerHTML = `
-          <div class="h-full w-full p-3 rounded-l-md">
+          <div
+            class="h-full w-full p-3 rounded-l-md selectFriend cursor-pointer"
+            id="${friend}"
+          >
             <button
-              class="h-full w-full rounded-l-md text-left pl-4 hover:bg-neutral-800"
+              class="h-full w-full rounded-l-md text-left pl-4 hover:bg-neutral-800 flex items-center"
             >
-              <i class="fa-regular fa-user mr-2"></i>${friend}(${rating})
+              <i class="fa-regular fa-user mr-2"></i>
+              <div>${friend}(${rating})</div>
+              <div 
+                class="ml-4 w-4 h-4 rounded-full bg-lime-600 ${hide}"
+                id = "${friend}state">
+              </div>
             </button>
           </div>
           <div class="flex">
@@ -363,8 +453,8 @@
                 >0</span
               >
             </button>
-            <button 
-              class="w-12 bg-rose-800 rounded-r-md removeFriend" 
+            <button
+              class="w-12 bg-rose-800 rounded-r-md removeFriend"
               id="${friend}"
               onclick = "removeFriend('${friend}')"
             >
@@ -451,7 +541,6 @@
     if (msgBtnId === currChat.innerText) return;
     currChat.innerText = msgBtnId;
     let badgeId = document.getElementById(`${msgBtnId}badge`);
-    console.log(badgeId);
     badgeId.style.display = "none";
     let read = parseInt(badgeId.innerText);
     badge.innerText = parseInt(badge.innerText) - read;
@@ -484,6 +573,17 @@
     xhr.send();
     msgBtn.addEventListener("click", () => {
       msgFunc(msgBtn.id);
+    });
+  }
+
+  function selectFriend(friend) {
+    selectedFriend.innerText = friend;
+    selectedFriend.style.fontSize = "1rem";
+  }
+
+  for (let selectFriendBtn of selectFriendBtns) {
+    selectFriendBtn.addEventListener("click", () => {
+      selectFriend(selectFriendBtn.id);
     });
   }
 
@@ -540,6 +640,75 @@
       badge.innerText = parseInt(badge.innerText) - 1;
       if (parseInt(badge.innerText) == 0) badge.style.display = "none";
     }
+  });
+
+  createChallengeForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    let gamemode = event.target.gamemode.value;
+    let playAs = event.target.playAs.value;
+    let opponent = selectedFriend.innerText;
+    if (opponent == "(Select a friend)") {
+      Toast.fire({
+        icon: "error",
+        title: "Select a friend to challenge"
+      });
+    } else if (gamemode == "") {
+      Toast.fire({
+        icon: "error",
+        title: "Select a gamemode"
+      });
+    } else if (playAs == "") {
+      Toast.fire({
+        icon: "error",
+        title: "Select a color"
+      });
+    } else if (!sendChallenge){
+      Toast.fire({
+        icon: "error",
+        title: "You can send one challenge at a time"
+      });
+    } 
+    else {
+      sendChallenge = false;
+      Toast.fire({
+        icon: "success",
+        title: "Challenge sent"
+      });
+      socket.emit("challenge", "<%= currUser.username %>", opponent, gamemode, playAs);
+    }
+  });
+
+  socket.on("challenge failed", (opponent) => {
+    sendChallenge = true;
+    let message = `${opponent} is playing a match`;
+    if(opponent == "<%= currUser.username %>"){
+      message = "Challenge Failed! Cannot send challenge during a match";
+    }
+    Toast.fire({
+        icon: "error",
+        title: `${message}`,
+      });
+  });
+
+  socket.on("challenge declined", (opponent) => {
+    sendChallenge = true;
+    Toast.fire({
+        icon: "warning",
+        title: `${opponent} declined your challenge`,
+      });
+  });
+
+  socket.on("friend connected", (friend) => {
+    console.log(`${friend} connected`);
+    let state = document.getElementById(`${friend}state`);
+    console.log(state);
+    state.style.display = "block";
+  });
+
+  socket.on("friend disconnected", (friend) => {
+    console.log(`${friend} disconnected`);
+    let state = document.getElementById(`${friend}state`);
+    state.style.display = "none";
   });
 </script>
 <script>

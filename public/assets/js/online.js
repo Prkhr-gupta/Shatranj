@@ -28,7 +28,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const mode = urlParams.get("mode");
 const roomId = urlParams.get("roomId");
 const player_color = urlParams.get("color");
-socket.emit("join room", mode, roomId, player_color);
+socket.emit("join room", mode, roomId, player_color, user);
 let gameHasStarted = false;
 let gameOver = false;
 var draw = document.getElementById("draw");
@@ -362,6 +362,8 @@ socket.on("enterGame", function (gameInfo) {
     if (player_color == chat.color) pos = "self-end";
     createMsg(chat.text, pos);
   }
+  draw.style.display = "inline-block";
+  resign.style.display = "inline-block";
 });
 
 let timer2 = document.getElementById("timer2");
@@ -505,7 +507,7 @@ socket.on("rematch accepted", (nwRoomId) => {
   }
   socket.emit("leave room", roomId);
   window.location.replace(
-    `/online?mode=bullet&roomId=${nwRoomId}&color=${nwColor}`
+    `/online?mode=${mode}&roomId=${nwRoomId}&color=${nwColor}`
   );
 });
 
@@ -555,7 +557,7 @@ text.addEventListener("keypress", (event) => {
   }
 });
 
-socket.on("msg recieved", (text) => {
+socket.on("live msg recieved", (text) => {
   notifySound.play();
   createMsg(text, "self-start");
 });
