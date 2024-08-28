@@ -38,29 +38,41 @@ var resign = document.getElementById("resign");
 function gameAlert(title, msg, icon) {
   gameEndSound.play();
   gameOver = true;
-  socket.emit("game over", mode, roomId);
-  Swal.fire({
-    title: `${title}`,
-    text: `${msg}`,
-    showDenyButton: true,
-    confirmButtonText: "Rematch",
-    denyButtonText: "Cancel",
-    icon: `${icon}`,
-    width: "24rem",
-    color: "#fff",
-    background: "rgb(28, 28, 34)",
-    buttonsStyling: false,
-    customClass: {
-      confirmButton: "Swal-btn-confirm",
-      denyButton: "Swal-btn-deny",
-    },
-  }).then((result) => {
-    draw.style.display = "none";
-    resign.style.display = "none";
-    rematch.style.display = "inline-block";
-    if (result.isConfirmed) {
-      socket.emit("rematch", roomId);
+  socket.emit("game over", mode, roomId, user, icon);
+  socket.on("game results", (currRating, ratingChange, newRating) => {
+    console.log(currRating, ratingChange, newRating);
+    let sign = "+";
+    if (ratingChange < 0) {
+      ratingChange = 8;
+      sign = "-";
     }
+    let ratingMessage = `new rating : ${currRating} ${sign} ${ratingChange} = ${newRating}`;
+    Swal.fire({
+      title: `${title}`,
+      html: `
+        <p>${msg}</p>
+        <p>${ratingMessage}</p>
+      `,
+      showDenyButton: true,
+      confirmButtonText: "Rematch",
+      denyButtonText: "Cancel",
+      icon: `${icon}`,
+      width: "26rem",
+      color: "#fff",
+      background: "rgb(28, 28, 34)",
+      buttonsStyling: false,
+      customClass: {
+        confirmButton: "Swal-btn-confirm",
+        denyButton: "Swal-btn-deny",
+      },
+    }).then((result) => {
+      draw.style.display = "none";
+      resign.style.display = "none";
+      rematch.style.display = "inline-block";
+      if (result.isConfirmed) {
+        socket.emit("rematch", roomId);
+      }
+    });
   });
 }
 

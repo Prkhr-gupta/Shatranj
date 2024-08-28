@@ -102,16 +102,20 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("game over", async (mode, roomId) => {
-      await User.updateOne(
-        { username: games[mode][roomId].player1 },
+    socket.on("game over", async (mode, roomId, username, icon) => {
+      let ratingChange = 0;
+      if (icon == "error") ratingChange = -8;
+      if (icon == "success") ratingChange = 8;
+      let user = await User.findOneAndUpdate(
+        { username: username },
         { isPlaying: false }
       );
-      await User.updateOne(
-        { username: games[mode][roomId].player2 },
-        { isPlaying: false }
-      );
+      let currRating = user.rating;
+      if (currRating < 50) ratingChange = 0;
+      let newRating = currRating + ratingChange;
+      await User.updateOne({ username: username }, { rating: newRating });
       games[mode][roomId].gameOver = true;
+      io.to(username).emit("game results", currRating, ratingChange, newRating);
     });
 
     socket.on("leave room", (roomId) => {

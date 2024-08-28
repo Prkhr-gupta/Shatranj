@@ -175,6 +175,10 @@ app.get("/user/unread/:username", async (req, res) => {
   res.send(`${unReadCnt}`);
 });
 
+app.get("/:username", async (req, res) => {
+  res.render("pages/games.ejs");
+});
+
 app.get("/signup", (req, res) => {
   res.render("pages/signup.ejs");
 });
