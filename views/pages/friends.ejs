@@ -74,10 +74,10 @@
               <i class="fa-regular fa-user mr-2"></i>
               <div><%= friend.username %> (<%= friend.rating %>)</div>
               <div
-              <% if(friend.state === false) { %> style="display: none;" <% } %>
+              <% if(friend.isOnline === false) { %> style="display: none;" <% } %>
                 class="ml-4 w-4 h-4 rounded-full bg-lime-600"
                 
-                id="<%= friend.username %>state"
+                id="<%= friend.username %>isOnline"
           
               >
               </div>
@@ -417,24 +417,25 @@
     badgeReq.innerText = parseInt(badgeReq.innerText) + 1;
   });
 
-  socket.on("accepted", (friend, rating, state) => {
+  socket.on("accepted", (friend, rating, isOnline) => {
     friends.push(friend);
     let hide = "hidden";
-    if (state) hide = "";
+    if (isOnline) hide = "";
     let div = document.createElement("div");
     div.innerHTML = `
           <div
-            class="h-full w-full p-3 rounded-l-md selectFriend cursor-pointer"
+            class="h-full w-full p-3 rounded-l-md hover:bg-neutral-800 selectFriend cursor-pointer"
             id="${friend}"
+            onclick = "selectFriend('${friend}')"
           >
             <button
-              class="h-full w-full rounded-l-md text-left pl-4 hover:bg-neutral-800 flex items-center"
+              class="h-full w-full rounded-l-md text-left pl-4 flex items-center"
             >
               <i class="fa-regular fa-user mr-2"></i>
               <div>${friend}(${rating})</div>
               <div 
                 class="ml-4 w-4 h-4 rounded-full bg-lime-600 ${hide}"
-                id = "${friend}state">
+                id = "${friend}isOnline">
               </div>
             </button>
           </div>
@@ -700,15 +701,15 @@
 
   socket.on("friend connected", (friend) => {
     console.log(`${friend} connected`);
-    let state = document.getElementById(`${friend}state`);
-    console.log(state);
-    state.style.display = "block";
+    let isOnline = document.getElementById(`${friend}isOnline`);
+    console.log(isOnline);
+    isOnline.style.display = "block";
   });
 
   socket.on("friend disconnected", (friend) => {
     console.log(`${friend} disconnected`);
-    let state = document.getElementById(`${friend}state`);
-    state.style.display = "none";
+    let isOnline = document.getElementById(`${friend}isOnline`);
+    isOnline.style.display = "none";
   });
 </script>
 <script>

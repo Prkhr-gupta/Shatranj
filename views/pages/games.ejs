@@ -8,87 +8,145 @@
         src="img/chesspieces/wikipedia/wQ.png"
         alt="Profile Picture"
       />
-      <div class="h-full text-5xl text-neutral-200 flex items-center">
-        prkhr
+      <div class="h-full text-4xl text-neutral-200 flex items-center">
+        <%=user.username%>
       </div>
     </div>
     <div class="px-7 text-neutral-200">
-      <div>
-        <i class="fa-solid fa-envelope mr-2"></i>prakharofficial@gmail.com
-      </div>
-      <div><i class="fa-solid fa-chart-simple mr-2"></i> 448</div>
+      <div><i class="fa-solid fa-envelope mr-2"></i><%=user.email%></div>
+      <div><i class="fa-solid fa-chart-simple mr-2"></i><%=user.rating%></div>
     </div>
   </div>
   <div
-    class="w-9/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
+    class="w-8/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
   >
     <h2 class="text-2xl text-center mt-2 mb-1">
       <i class="fa-solid fa-square-poll-vertical mr-2 text-xl"></i>Stats
     </h2>
     <hr />
     <div class="mt-3 pl-4">
-      <div><i class="fa-brands fa-delicious mr-2"></i>Games - 14</div>
+      <div>
+        <i class="fa-brands fa-delicious mr-2"></i>Games -
+        <%=user.stats.overall.games%>
+      </div>
       <div class="flex">
-        <div><i class="fa-solid fa-trophy mr-2 text-lime-700"></i>8 Wins</div>
         <div>
-          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i>6 Loses
+          <i class="fa-solid fa-trophy mr-2 text-lime-700"></i
+          ><%=user.stats.overall.wins%>
+        </div>
+        <div>
+          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i
+          ><%=user.stats.overall.loses%>
+        </div>
+        <div>
+          <i class="fa-solid fa-handshake mr-2 ml-6 text-rose-200"></i
+          ><%=user.stats.overall.draws%>
         </div>
       </div>
-      <div><i class="fa-solid fa-percent"></i></div>
+      <div>
+        <i class="fa-solid fa-percent mr-2"></i>
+        <% let winPO = user.stats.overall.wins/user.stats.overall.games * 100 %>
+        <% if(!winPO) winPO = 0 %> <% winPO = winPO.toFixed(2) %> <%= winPO %>
+      </div>
     </div>
   </div>
   <div
-    class="w-9/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
+    class="w-8/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
   >
     <h2 class="text-2xl text-center mt-2 mb-1">
       <i class="fa-regular fa-hourglass mr-2 text-xl"></i>Bullet
     </h2>
     <hr />
     <div class="mt-3 pl-4">
-      <div><i class="fa-brands fa-delicious mr-2"></i>Games - 14</div>
+      <div>
+        <i class="fa-brands fa-delicious mr-2"></i>Games -
+        <%=user.stats.bullet.games%>
+      </div>
       <div class="flex">
-        <div><i class="fa-solid fa-trophy mr-2 text-lime-700"></i>8 Wins</div>
         <div>
-          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i>6 Loses
+          <i class="fa-solid fa-trophy mr-2 text-lime-700"></i
+          ><%=user.stats.bullet.wins%>
+        </div>
+        <div>
+          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i
+          ><%=user.stats.bullet.loses%>
+        </div>
+        <div>
+          <i class="fa-solid fa-handshake mr-2 ml-6 text-rose-200"></i
+          ><%=user.stats.bullet.draws%>
         </div>
       </div>
-      <div><i class="fa-solid fa-percent"></i></div>
+      <div>
+        <i class="fa-solid fa-percent"></i>
+        <% let winPB = user.stats.bullet.wins/user.stats.bullet.games * 100 %>
+        <% if(!winPB) winPB = 0 %> <% winPB = winPB.toFixed(2) %> <%= winPB %>
+      </div>
     </div>
   </div>
   <div
-    class="w-9/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
+    class="w-8/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
   >
     <h2 class="text-2xl text-center mt-2 mb-1">
       <i class="fa-solid fa-bolt mr-2 text-xl"></i>Blitz
     </h2>
     <hr />
     <div class="mt-3 pl-4">
-      <div><i class="fa-brands fa-delicious mr-2"></i>Games - 14</div>
+      <div>
+        <i class="fa-brands fa-delicious mr-2"></i>Games -
+        <%=user.stats.blitz.games%>
+      </div>
       <div class="flex">
-        <div><i class="fa-solid fa-trophy mr-2 text-lime-700"></i>8 Wins</div>
         <div>
-          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i>6 Loses
+          <i class="fa-solid fa-trophy mr-2 text-lime-700"></i
+          ><%=user.stats.blitz.wins%>
+        </div>
+        <div>
+          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i
+          ><%=user.stats.blitz.loses%>
+        </div>
+        <div>
+          <i class="fa-solid fa-handshake mr-2 ml-6 text-rose-200"></i
+          ><%=user.stats.blitz.draws%>
         </div>
       </div>
-      <div><i class="fa-solid fa-percent"></i></div>
+      <div>
+        <i class="fa-solid fa-percent"></i>
+        <% let winPZ = user.stats.blitz.wins/user.stats.blitz.games * 100 %> <%
+        if(!winPZ) winPZ = 0 %> <% winPZ = winPZ.toFixed(2) %> <%= winPZ %>
+      </div>
     </div>
   </div>
   <div
-    class="w-9/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
+    class="w-8/12 m-2 rounded-md border-2 border-neutral-800 text-neutral-200"
   >
     <h2 class="text-2xl text-center mt-2 mb-1">
       <i class="fa-solid fa-clock mr-2 text-xl"></i>Rapid
     </h2>
     <hr />
     <div class="mt-3 pl-4">
-      <div><i class="fa-brands fa-delicious mr-2"></i>Games - 14</div>
+      <div>
+        <i class="fa-brands fa-delicious mr-2"></i>Games -
+        <%=user.stats.rapid.games%>
+      </div>
       <div class="flex">
-        <div><i class="fa-solid fa-trophy mr-2 text-lime-700"></i>8 Wins</div>
         <div>
-          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i>6 Loses
+          <i class="fa-solid fa-trophy mr-2 text-lime-700"></i
+          ><%=user.stats.rapid.wins%>
+        </div>
+        <div>
+          <i class="fa-solid fa-flag mr-2 ml-6 text-rose-700"></i
+          ><%=user.stats.rapid.loses%>
+        </div>
+        <div>
+          <i class="fa-solid fa-handshake mr-2 ml-6 text-rose-200"></i
+          ><%=user.stats.rapid.draws%>
         </div>
       </div>
-      <div><i class="fa-solid fa-percent"></i></div>
+      <div>
+        <i class="fa-solid fa-percent"></i>
+        <% let winPR = user.stats.rapid.wins/user.stats.rapid.games * 100 %> <%
+        if(!winPR) winPR = 0 %> <% winPR = winPR.toFixed(2) %> <%= winPR %>
+      </div>
     </div>
   </div>
 </div>
@@ -113,30 +171,44 @@
           <th scope="col" class="px-6 py-3">Moves</th>
           <th scope="col" class="px-6 py-3">Game Review</th>
           <th scope="col" class="px-6 py-3">Date</th>
+          <th scope="col" class="px-6 py-3">Time</th>
         </tr>
       </thead>
       <tbody>
+        <% let len = user.matches.length %> <% for(let i=len-1; i>=0; i--) { %>
         <tr
           class="odd:bg-white odd:dark:bg-neutral-900 even:bg-neutral-50 even:dark:bg-neutral-800 border-b dark:border-neutral-700"
         >
-          <th
-            scope="row"
-            class="px-6 py-4 font-medium text-neutral-900 whitespace-nowrap dark:text-neutral-200"
-          >
-            Bullet
+          <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap">
+            <%=user.matches[i].mode%>
           </th>
           <td class="px-6 py-4">
             <a
-              href="#"
+              href="/<%=user.matches[i].player2%>"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >prkhr_gupta</a
+              ><%=user.matches[i].player2%></a
             >
           </td>
           <td class="px-6 py-4">
-            <i class="fa-solid fa-trophy mr-2 text-lime-700"></i>1-0
+            <% if(user.matches[i].result == "1-0") { %>
+            <i class="fa-solid fa-trophy mr-2 text-lime-700"></i
+            ><%=user.matches[i].result%> <% } %> <% if(user.matches[i].result ==
+            "0-1") { %>
+            <i class="fa-solid fa-flag mr-2 text-rose-700"></i
+            ><%=user.matches[i].result%> <% } %> <% if(user.matches[i].result ==
+            "1/2-1/2") { %>
+            <i class="fa-solid fa-handshake mr-2 text-rose-200"></i
+            ><%=user.matches[i].result%> <% } %>
           </td>
-          <td class="px-6 py-4">448(+8)</td>
-          <td class="px-6 py-4">32</td>
+          <td class="px-6 py-4">
+            <% if(user.matches[i].ratingChange < 0) { %>
+            <%=user.matches[i].newRating%>
+            (-<%=Math.abs(user.matches[i].ratingChange)%>) <% } %> <%
+            if(user.matches[i].ratingChange >= 0) { %>
+            <%=user.matches[i].newRating%> (+<%=user.matches[i].ratingChange%>)
+            <% } %>
+          </td>
+          <td class="px-6 py-4"><%=user.matches[i].moves%></td>
           <td class="px-6 py-4">
             <a
               href="#"
@@ -144,69 +216,27 @@
               >Review</a
             >
           </td>
-          <td class="px-6 py-4">24/08/2024</td>
+          <td class="px-6 py-4"><%=user.matches[i].date%></td>
+          <td class="px-6 py-4"><%=user.matches[i].time%></td>
         </tr>
-        <tr
-          class="odd:bg-white odd:dark:bg-neutral-900 even:bg-neutral-50 even:dark:bg-neutral-800 border-b dark:border-neutral-700"
-        >
-          <th
-            scope="row"
-            class="px-6 py-4 font-medium text-neutral-900 whitespace-nowrap dark:text-neutral-200"
-          >
-            Bullet
-          </th>
-          <td class="px-6 py-4">
-            <a
-              href="#"
-              class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >prkhr_gupta</a
-            >
-          </td>
-          <td class="px-6 py-4">
-            <i class="fa-solid fa-trophy mr-2 text-lime-700"></i>1-0
-          </td>
-          <td class="px-6 py-4">448(+8)</td>
-          <td class="px-6 py-4">32</td>
-          <td class="px-6 py-4">
-            <a
-              href="#"
-              class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >Review</a
-            >
-          </td>
-          <td class="px-6 py-4">24/08/2024</td>
-        </tr>
-        <tr
-          class="odd:bg-white odd:dark:bg-neutral-900 even:bg-neutral-50 even:dark:bg-neutral-800 border-b dark:border-neutral-700"
-        >
-          <th
-            scope="row"
-            class="px-6 py-4 font-medium text-neutral-900 whitespace-nowrap dark:text-neutral-200"
-          >
-            Bullet
-          </th>
-          <td class="px-6 py-4">
-            <a
-              href="#"
-              class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >prkhr_gupta</a
-            >
-          </td>
-          <td class="px-6 py-4">
-            <i class="fa-solid fa-trophy mr-2 text-lime-700"></i>1-0
-          </td>
-          <td class="px-6 py-4">448(+8)</td>
-          <td class="px-6 py-4">32</td>
-          <td class="px-6 py-4">
-            <a
-              href="#"
-              class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >Review</a
-            >
-          </td>
-          <td class="px-6 py-4">24/08/2024</td>
-        </tr>
+        <% } %>
       </tbody>
     </table>
   </div>
 </div>
+<script>
+  let user = "";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      console.log("fetched", unReadCnt);
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
+</script>

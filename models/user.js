@@ -12,8 +12,9 @@ const userSchema = new Schema({
     type: Number,
     default: 400,
   },
-  state: {
+  isOnline: {
     type: Boolean,
+    default: true,
   },
   isPlaying: {
     type: Boolean,
@@ -32,6 +33,80 @@ const userSchema = new Schema({
       ref: "Match",
     },
   ],
+  stats: {
+    overall: {
+      games: {
+        type: Number,
+        default: 0,
+      },
+      wins: {
+        type: Number,
+        default: 0,
+      },
+      loses: {
+        type: Number,
+        default: 0,
+      },
+      draws: {
+        type: Number,
+        default: 0,
+      },
+    },
+    bullet: {
+      games: {
+        type: Number,
+        default: 0,
+      },
+      wins: {
+        type: Number,
+        default: 0,
+      },
+      loses: {
+        type: Number,
+        default: 0,
+      },
+      draws: {
+        type: Number,
+        default: 0,
+      },
+    },
+    blitz: {
+      games: {
+        type: Number,
+        default: 0,
+      },
+      wins: {
+        type: Number,
+        default: 0,
+      },
+      loses: {
+        type: Number,
+        default: 0,
+      },
+      draws: {
+        type: Number,
+        default: 0,
+      },
+    },
+    rapid: {
+      games: {
+        type: Number,
+        default: 0,
+      },
+      wins: {
+        type: Number,
+        default: 0,
+      },
+      loses: {
+        type: Number,
+        default: 0,
+      },
+      draws: {
+        type: Number,
+        default: 0,
+      },
+    },
+  },
 });
 
 userSchema.plugin(passportLocalMongoose);

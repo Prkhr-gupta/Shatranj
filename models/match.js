@@ -2,15 +2,18 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const matchSchema = new Schema({
+  roomId: String,
   mode: String,
-  opponent: String,
+  player1: String,
+  player2: String,
   result: String,
   ratingChange: Number,
   newRating: Number,
   moves: Number,
-  date: Date,
+  date: String,
+  time: String,
   history: [String],
-  verbose: [],
+  gameFEN: [String],
 });
 
 const Match = mongoose.model("Match", matchSchema);

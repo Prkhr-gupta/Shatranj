@@ -286,6 +286,7 @@ function updateStatus() {
     }
   }
 
+  console.log(game.fen());
   $status.html(status);
   $fen.html(game.fen());
   $pgn.html(game.pgn());

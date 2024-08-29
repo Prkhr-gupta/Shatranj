@@ -124,7 +124,7 @@
   });
 </script>
 <script>
-  let user = "guest";
+  let user = "";
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);

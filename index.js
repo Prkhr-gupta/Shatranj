@@ -175,10 +175,6 @@ app.get("/user/unread/:username", async (req, res) => {
   res.send(`${unReadCnt}`);
 });
 
-app.get("/:username", async (req, res) => {
-  res.render("pages/games.ejs");
-});
-
 app.get("/signup", (req, res) => {
   res.render("pages/signup.ejs");
 });
@@ -230,6 +226,12 @@ app.get("/logout", (req, res, next) => {
     req.flash("success", "You are logged out!");
     res.redirect("/");
   });
+});
+
+app.get("/:username", async (req, res) => {
+  let { username } = req.params;
+  let user = await User.findOne({ username: username }).populate("matches");
+  res.render("pages/games.ejs", { user });
 });
 
 app.all("*", (req, res, next) => {

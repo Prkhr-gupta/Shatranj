@@ -1,4 +1,5 @@
 const User = require("../models/user.js");
+const Match = require("../models/match.js");
 const Chat = require("../models/chat.js");
 const { v4: uuidv4 } = require("uuid");
 
@@ -73,7 +74,7 @@ module.exports = (io) => {
             games[mode][roomId].player2 = `${username}`;
             games[mode][roomId].player2Color = `${color}`;
             let timeControl =
-              mode === "bullet" ? 30 : mode === "blitz" ? 180 : 600;
+              mode === "bullet" ? 60 : mode === "blitz" ? 180 : 600;
             games[mode][roomId].timer1 = timeControl;
             games[mode][roomId].timer2 = timeControl;
             games[mode][roomId].gameHasStarted = true;
@@ -102,7 +103,7 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("game over", async (mode, roomId, username, icon) => {
+    socket.on("game over", async (mode, roomId, username, icon, gameFEN) => {
       let ratingChange = 0;
       if (icon == "error") ratingChange = -8;
       if (icon == "success") ratingChange = 8;
@@ -116,6 +117,40 @@ module.exports = (io) => {
       await User.updateOne({ username: username }, { rating: newRating });
       games[mode][roomId].gameOver = true;
       io.to(username).emit("game results", currRating, ratingChange, newRating);
+      let opponent = games[mode][roomId].player1;
+      if (opponent == username) opponent = games[mode][roomId].player2;
+      let result = "1-0";
+      if (icon == "error") result = "0-1";
+      if (icon == "warning") result = "1/2-1/2";
+      let movesCnt = games[mode][roomId].history.length;
+      let moves = Math.floor((movesCnt + 1) / 2);
+      let newMatch = new Match({
+        roomId: roomId,
+        mode: mode,
+        player1: username,
+        player2: opponent,
+        result: result,
+        ratingChange: ratingChange,
+        newRating: newRating,
+        moves: moves,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        history: games[mode][roomId].history,
+        gameFEN: gameFEN,
+      });
+      await newMatch.save();
+      let res = "draws";
+      if (icon == "success") res = "wins";
+      else if (icon == "error") res = "loses";
+      let stats = user.stats;
+      stats.overall.games++;
+      stats.overall[res]++;
+      stats[mode].games++;
+      stats[mode][res]++;
+      await User.updateOne(
+        { username: username },
+        { $push: { matches: newMatch }, stats: stats }
+      );
     });
 
     socket.on("leave room", (roomId) => {
@@ -213,8 +248,18 @@ module.exports = (io) => {
         { username: username2 },
         { $pull: { requests: username1 } }
       );
-      io.to(username1).emit("accepted", username2, user2.rating, user2.state);
-      io.to(username2).emit("accepted", username1, user1.rating, user1.state);
+      io.to(username1).emit(
+        "accepted",
+        username2,
+        user2.rating,
+        user2.isOnline
+      );
+      io.to(username2).emit(
+        "accepted",
+        username1,
+        user1.rating,
+        user1.isOnline
+      );
     });
 
     socket.on("declined", async (username1, username2) => {
@@ -245,7 +290,7 @@ module.exports = (io) => {
       socket.privateRoom = username;
       let user = await User.findOneAndUpdate(
         { username: username },
-        { $set: { state: true } }
+        { $set: { isOnline: true } }
       ).populate("friends");
       for (let friend of user.friends) {
         io.to(friend.username).emit("friend connected", username);
@@ -257,7 +302,7 @@ module.exports = (io) => {
       console.log(username, "disconnected");
       let user = await User.findOneAndUpdate(
         { username: username },
-        { $set: { state: false } }
+        { $set: { isOnline: false } }
       ).populate("friends");
       if (user) {
         for (let friend of user.friends) {

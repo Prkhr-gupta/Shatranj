@@ -29,16 +29,19 @@ const mode = urlParams.get("mode");
 const roomId = urlParams.get("roomId");
 const player_color = urlParams.get("color");
 socket.emit("join room", mode, roomId, player_color, user);
-let gameHasStarted = false;
-let gameOver = false;
+var gameHasStarted = false;
+var gameOver = false;
 var draw = document.getElementById("draw");
 var rematch = document.getElementById("rematch");
 var resign = document.getElementById("resign");
+var gameFEN = [];
+var enemy = document.getElementById("enemy");
+var enemyChat = document.getElementById("enemyChat");
 
 function gameAlert(title, msg, icon) {
   gameEndSound.play();
   gameOver = true;
-  socket.emit("game over", mode, roomId, user, icon);
+  socket.emit("game over", mode, roomId, user, icon, gameFEN);
   socket.on("game results", (currRating, ratingChange, newRating) => {
     console.log(currRating, ratingChange, newRating);
     let sign = "+";
@@ -209,6 +212,7 @@ function onDrop(source, target) {
   // illegal move
   if (move === null) return "snapback";
   updateSidebar(move, game.history());
+  gameFEN.push(game.fen());
   socket.emit(
     "move",
     mode,
@@ -226,6 +230,7 @@ socket.on("newMove", function (theMove, gameInfo) {
   if (move === null) return;
   updateSidebar(move, game.history());
   board.position(game.fen());
+  gameFEN.push(game.fen());
   updateStatus();
 });
 
@@ -312,7 +317,6 @@ function updateStatus() {
       else if (moveType == "k" || moveType == "q") castleSound.play();
     }
   }
-
   $status.html(status);
   $fen.html(game.fen());
   $pgn.html(game.pgn());
@@ -354,7 +358,13 @@ const Toast = Swal.mixin({
 });
 
 socket.on("enterGame", function (gameInfo) {
-  if (gameInfo.gameHasStarted === true) gameHasStarted = true;
+  if (gameInfo.gameHasStarted === true) {
+    let opponent = gameInfo.player1;
+    if (opponent == user) opponent = gameInfo.player2;
+    enemy.innerText = opponent;
+    enemyChat.innerText = opponent;
+    gameHasStarted = true;
+  }
   let arr = gameInfo.verbose;
   let history = [];
   for (let i = 0; i < arr.length; i++) {
@@ -374,8 +384,10 @@ socket.on("enterGame", function (gameInfo) {
     if (player_color == chat.color) pos = "self-end";
     createMsg(chat.text, pos);
   }
-  draw.style.display = "inline-block";
-  resign.style.display = "inline-block";
+  if (gameInfo.gameHasStarted) {
+    draw.style.display = "inline-block";
+    resign.style.display = "inline-block";
+  }
 });
 
 let timer2 = document.getElementById("timer2");
@@ -383,6 +395,10 @@ let timer1 = document.getElementById("timer1");
 // timer2.innerText = startTime2;
 
 socket.on("startGame", (gameInfo) => {
+  let opponent = gameInfo.player1;
+  if (opponent == user) opponent = gameInfo.player2;
+  enemy.innerText = opponent;
+  enemyChat.innerText = opponent;
   Toast.fire({
     icon: "info",
     // title: "Match starting in x",
