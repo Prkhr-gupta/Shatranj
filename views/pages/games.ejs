@@ -5,7 +5,7 @@
     <div class="h-1/2 px-4 flex items-center">
       <img
         class="h-2/3"
-        src="img/chesspieces/wikipedia/wQ.png"
+        src="/img/chesspieces/wikipedia/wQ.png"
         alt="Profile Picture"
       />
       <div class="h-full text-4xl text-neutral-200 flex items-center">
@@ -211,7 +211,7 @@
           <td class="px-6 py-4"><%=user.matches[i].moves%></td>
           <td class="px-6 py-4">
             <a
-              href="#"
+              href="/review/<%= user.matches[i]._id %>"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
               >Review</a
             >

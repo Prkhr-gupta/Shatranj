@@ -1,0 +1,143 @@
+<% layout("/layouts/boilerplate") %>
+<div class="flex mt-3 justify-evenly">
+  <div class="bg-neutral-900 w-1/4 rounded-3xl text-white">
+    <label class="hidden">Status:</label>
+    <div class="hidden" id="status"></div>
+    <label class="hidden">FEN:</label>
+    <div class="hidden" id="fen"></div>
+    <label class="hidden">PGN:</label>
+    <div class="hidden" id="pgn"></div>
+    <div class="my-4 mx-1 text-center" id="opening">Opening</div>
+    <div
+      class="flex justify-center h-80 outline outline-neutral-800 overflow-y-scroll pt-2 moveTimeline"
+    >
+      <div class="w-20">
+        <ul class="move text-center">
+          <b>Move</b>
+        </ul>
+      </div>
+      <div class="w-20">
+        <ul class="whiteMove text-center even:bg-white">
+          <b>White</b>
+        </ul>
+      </div>
+      <div class="w-20">
+        <ul class="blackMove text-center even:bg-white">
+          <b>Black</b>
+        </ul>
+      </div>
+    </div>
+    <div class="h-16 m-4 flex justify-center items-center">
+      <div
+        class="bg-neutral-800 mx-2 h-10 w-10 rounded-lg flex justify-center items-center hover:bg-neutral-700 active:bg-neutral-600 active:scale-90"
+        id="startingPos"
+      >
+        <i class="fa-solid fa-angles-left text-3xl"></i>
+      </div>
+      <div
+        class="bg-neutral-800 mx-2 h-10 w-10 rounded-lg flex justify-center items-center hover:bg-neutral-700 active:bg-neutral-600 active:scale-90"
+        id="backward"
+      >
+        <i class="fa-solid fa-angle-left text-3xl"></i>
+      </div>
+      <div
+        class="bg-neutral-800 mx-2 h-10 w-10 rounded-lg flex justify-center items-center hover:bg-neutral-700 active:bg-neutral-600 active:scale-90"
+        id="forward"
+      >
+        <i class="fa-solid fa-angle-right text-3xl"></i>
+      </div>
+      <div
+        class="bg-neutral-800 mx-2 h-10 w-10 rounded-lg flex justify-center items-center hover:bg-neutral-700 active:bg-neutral-600 active:scale-90"
+        id="endingPos"
+      >
+        <i class="fa-solid fa-angles-right text-3xl"></i>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="text-white flex justify-between items-center">
+      <div id="enemy"><%= match.player2 %></div>
+    </div>
+    <div class="flex">
+      <div id="myBoard" style="width: 450px"></div>
+      <div class="bg-black ml-4 rounded-lg" style="height: 450px">
+        <div class="bg-black text-white rounded-t-lg" style="height: 25%">
+          <div class="mt-1 text-xs px-1">25%</div>
+        </div>
+        <div
+          class="bg-white text-black rounded-b-lg flex items-end"
+          style="height: 75%"
+        >
+          <div class="mb-1 text-xs px-1">75%</div>
+        </div>
+      </div>
+    </div>
+    <div class="text-white flex justify-between">
+      <div><%= match.player1 %></div>
+    </div>
+  </div>
+  <div class="bg-neutral-900 w-1/5 rounded-3xl text-white">
+    <div class="my-4 mx-1 text-center">Game Review</div>
+    <div
+      class="h-16 flex justify-center items-center border-t-2 border-neutral-800"
+    >
+      <button
+        class="bg-neutral-200 text-black w-1/2 h-8 rounded-2xl hover:bg-neutral-400 active:bg-neutral-600"
+        id="bestMove"
+      >
+        Best Move
+      </button>
+    </div>
+    <div
+      class="flex justify-center h-60 overflow-y-auto outline outline-neutral-800 pt-2"
+    >
+      <div class="w-24 text-center">
+        <b>White</b>
+        <ul class="text-center" id="whiteMoveReview"></ul>
+      </div>
+      <div class="w-24 text-center">
+        <b>Black</b>
+        <ul class="text-center" id="blackMoveReview"></ul>
+      </div>
+    </div>
+    <div class="h-16 m-4 flex flex-col justify-center items-center">
+      <button
+        class="bg-neutral-200 my-2 py-1 text-black w-3/4 h-8 rounded-2xl hover:bg-neutral-400 active:bg-neutral-600"
+        id="topEngineLine"
+      >
+        Top Engine Line
+      </button>
+      <button
+        class="bg-neutral-200 my-2 py-1 text-black w-3/4 h-8 rounded-2xl hover:bg-neutral-400 active:bg-neutral-600"
+        id="currentPos"
+      >
+        Current Position
+      </button>
+    </div>
+  </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+  crossorigin="anonymous"
+></script>
+<script src="/assets/js/chessboard-1.0.0.js"></script>
+<script src="/assets/js/chessboard-1.0.0.min.js"></script>
+<script src="/assets/js/chess-0.10.3.min.js"></script>
+<script src="/assets/js/review.js" type="module"></script>
+<script>
+  const match = <%-JSON.stringify(match)%>;
+  let user = "guest";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `/user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
+</script>

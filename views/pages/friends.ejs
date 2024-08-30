@@ -23,7 +23,6 @@
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </div>
-      <div class="h-8 w-8/12 mb-3 hidden" id="loading">Loading...</div>
     </div>
     <div class="h-2/3 bg-neutral-900 m-3 rounded-2xl pt-8">
       <div class="text-white">
@@ -244,7 +243,7 @@
           <button class="mx-1" id="sendMsg">
             <img
               class="h-6 active:scale-50"
-              src="img/sendMsg.png"
+              src="/img/sendMsg.png"
               alt="sendMsg"
             />
           </button>
@@ -278,11 +277,7 @@
 
   function search() {
     xhr.open("GET", `user/find/${addFriend.value}`, true);
-    xhr.onprogress = () => {
-      loading.style.display = "flex";
-    };
     xhr.onload = () => {
-      loading.style.display = "none";
       let data = xhr.responseText;
       addFriend.value = "";
       if (!data) {
@@ -339,6 +334,7 @@
 
   serachUser.addEventListener("click", () => {
     if (addFriend.value != "") {
+      console.log(addFriend.value);
       search();
     }
   });

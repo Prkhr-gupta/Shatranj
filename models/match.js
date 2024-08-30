@@ -6,6 +6,8 @@ const matchSchema = new Schema({
   mode: String,
   player1: String,
   player2: String,
+  p1Color: String,
+  p2Color: String,
   result: String,
   ratingChange: Number,
   newRating: Number,

@@ -234,6 +234,12 @@ app.get("/:username", async (req, res) => {
   res.render("pages/games.ejs", { user });
 });
 
+app.get("/review/:gameId", async (req, res) => {
+  let { gameId } = req.params;
+  let match = await Match.findById(gameId);
+  res.render("pages/review.ejs", { match });
+});
+
 app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });

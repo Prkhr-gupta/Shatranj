@@ -118,7 +118,13 @@ module.exports = (io) => {
       games[mode][roomId].gameOver = true;
       io.to(username).emit("game results", currRating, ratingChange, newRating);
       let opponent = games[mode][roomId].player1;
-      if (opponent == username) opponent = games[mode][roomId].player2;
+      let userColor = games[mode][roomId].player2Color;
+      let opponentColor = games[mode][roomId].player1Color;
+      if (opponent == username) {
+        opponent = games[mode][roomId].player2;
+        userColor = games[mode][roomId].player1Color;
+        opponentColor = games[mode][roomId].player2Color;
+      }
       let result = "1-0";
       if (icon == "error") result = "0-1";
       if (icon == "warning") result = "1/2-1/2";
@@ -129,6 +135,8 @@ module.exports = (io) => {
         mode: mode,
         player1: username,
         player2: opponent,
+        p1Color: userColor,
+        p2Color: opponentColor,
         result: result,
         ratingChange: ratingChange,
         newRating: newRating,
