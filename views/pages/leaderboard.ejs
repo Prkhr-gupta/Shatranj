@@ -1,0 +1,170 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="flex">
+  <div class="row bg-neutral-900 m-4 rounded-lg w-8/12 h-full">
+    <div class="col-8 offset-2 my-4">
+      <h1 class="text-5xl text-neutral-200 text-center">Leaderboard</h1>
+    </div>
+
+    <div class="col-12 shadow-md sm:rounded-lg my-4">
+      <table
+        class="w-full text-sm text-left rtl:text-right text-neutral-500 dark:text-neutral-400"
+      >
+        <thead
+          class="text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-700 dark:text-neutral-400"
+        >
+          <tr>
+            <th scope="col" class="px-6 py-3">Title</th>
+            <th scope="col" class="px-6 py-3">Username</th>
+            <th scope="col" class="px-6 py-3">Rating</th>
+            <th scope="col" class="px-6 py-3">Games</th>
+            <th scope="col" class="px-6 py-3">Win %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let len = allUsers.length %> <% for(let i=len-1; i>=0; i--) { %>
+          <tr
+            class="odd:bg-white odd:dark:bg-neutral-900 even:bg-neutral-50 even:dark:bg-neutral-800 border-b dark:border-neutral-700"
+          >
+            <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap">
+              <% if(allUsers[i].title == "Grandmaster") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wK.png"
+                alt="Grandmaster"
+              />
+              <% } %> <% if(allUsers[i].title == "International Master") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wQ.png"
+                alt="International Master"
+              />
+              <% } %> <% if(allUsers[i].title == "FIDE Master") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wR.png"
+                alt="FIDE Master"
+              />
+              <% } %> <% if(allUsers[i].title == "Candidate Master") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wB.png"
+                alt="Candidate Master"
+              />
+              <% } %> <% if(allUsers[i].title == "Intermediate") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wN.png"
+                alt="Intermediate"
+              />
+              <% } %> <% if(allUsers[i].title == "Beginner") { %>
+              <img
+                class="h-8"
+                src="/img/chesspieces/wikipedia/wP.png"
+                alt="Beginner"
+              />
+              <% } %>
+            </th>
+            <td class="px-6 py-4">
+              <a
+                href="/<%=allUsers[i].username%>"
+                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                ><%=allUsers[i].username%></a
+              >
+            </td>
+            <td class="px-6 py-4"><%=allUsers[i].rating%></td>
+            <td class="px-10 py-4"><%=allUsers[i].stats.overall.games%></td>
+            <td class="px-6 py-4">
+              <% let winPO =
+              allUsers[i].stats.overall.wins/allUsers[i].stats.overall.games *
+              100 %> <% if(!winPO) winPO = 0 %> <% winPO = winPO.toFixed(2) %>
+              <%= winPO %>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div
+    class="bg-neutral-900 text-white w-3/12 m-4 flex-col justify-evenly items-center h-full rounded-lg"
+  >
+    <div class="text-center m-4">
+      <h1 class="text-3xl">Chess Titles</h1>
+    </div>
+    <hr />
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img src="/img/chesspieces/wikipedia/wK.png" alt="Grandmaster" />
+      </div>
+      <div class="ml-2">
+        <p>Grandmaster</p>
+        <p>>= 3000 elo</p>
+      </div>
+    </div>
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img
+          src="/img/chesspieces/wikipedia/wQ.png"
+          alt="International Master"
+        />
+      </div>
+      <div class="ml-2">
+        <p>International Master</p>
+        <p>>= 2500 elo</p>
+      </div>
+    </div>
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img src="/img/chesspieces/wikipedia/wR.png" alt="FIDE Master" />
+      </div>
+      <div class="ml-2">
+        <p>FIDE Master</p>
+        <p>>= 2000 elo</p>
+      </div>
+    </div>
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img src="/img/chesspieces/wikipedia/wB.png" alt="Candidate Master" />
+      </div>
+      <div class="ml-2">
+        <p>Candidate Master</p>
+        <p>>= 1500 elo</p>
+      </div>
+    </div>
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img src="/img/chesspieces/wikipedia/wN.png" alt="Intermediate" />
+      </div>
+      <div class="ml-2">
+        <p>Intermediate</p>
+        <p>>= 1000 elo</p>
+      </div>
+    </div>
+    <div class="h-20 m-4 flex items-center">
+      <div>
+        <img src="/img/chesspieces/wikipedia/wP.png" alt="Beginner" />
+      </div>
+      <div class="ml-2">
+        <p>Beginner</p>
+        <p>< 1000 elo</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let user = "guest";
+  <% if(currUser) { %>
+    user = `<%= currUser.username %>`;
+    socket.emit("userConnect", user);
+    xhr.open("GET", `/user/unread/<%= currUser.username %>`, true);
+    xhr.onload = () => {
+      let unReadCnt = xhr.responseText;
+      badge.style.display = "block";
+      if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
+      else badge.style.display = "none";
+    };
+    xhr.send();
+  <% } %>
+</script>

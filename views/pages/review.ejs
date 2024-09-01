@@ -60,15 +60,20 @@
     </div>
     <div class="flex">
       <div id="myBoard" style="width: 450px"></div>
-      <div class="bg-black ml-4 rounded-lg" style="height: 450px">
-        <div class="bg-black text-white rounded-t-lg" style="height: 25%">
-          <div class="mt-1 text-xs px-1">25%</div>
+      <div class="ml-4 rounded-lg" style="height: 450px" id="evalMain">
+        <div
+          class="bg-black text-white rounded-t-lg w-7 transition-all duration-1000"
+          style="height: 50%"
+          id="blackEval"
+        >
+          <div class="mt-1 text-xs px-1 text-center" id="blackEvalText"></div>
         </div>
         <div
-          class="bg-white text-black rounded-b-lg flex items-end"
-          style="height: 75%"
+          class="bg-white text-black rounded-b-lg flex items-end w-7 transition-all duration-1000"
+          style="height: 50%"
+          id="whiteEval"
         >
-          <div class="mb-1 text-xs px-1">75%</div>
+          <div class="mb-1 text-xs px-1 text-center" id="whiteEvalText"></div>
         </div>
       </div>
     </div>

@@ -29,11 +29,45 @@ var topEngineLineBtn = document.getElementById("topEngineLine");
 var currentPos = document.getElementById("currentPos");
 var bestMove = null;
 var topEngineLine = null;
+var evaluation = 1.05;
 var allowed = true;
 var whiteMoveReview = document.getElementById("whiteMoveReview");
 var blackMoveReview = document.getElementById("blackMoveReview");
+var whiteEval = document.getElementById("whiteEval");
+var blackEval = document.getElementById("blackEval");
+var whiteEvalText = document.getElementById("whiteEvalText");
+var blackEvalText = document.getElementById("blackEvalText");
+var evalMain = document.getElementById("evalMain");
 
-function updateEvalBar(currFEN) {
+function calculatePer(value) {
+  let e = Math.abs(value);
+  if (e >= 10) return 49;
+  let per = Math.log10(e * 1.3 + 1);
+  per = (per / 1.3) * 50;
+  per = per.toFixed(1);
+  return per * 1;
+}
+
+function updateEvalBar(value) {
+  let per = calculatePer(value);
+  if (value >= 0) {
+    let percentW = 50 + per;
+    let percentB = 50 - per;
+    whiteEvalText.innerText = value;
+    whiteEval.style.height = `${percentW}%`;
+    blackEvalText.innerText = "";
+    blackEval.style.height = `${percentB}%`;
+  } else {
+    let percentW = 50 - per;
+    let percentB = 50 + per;
+    whiteEvalText.innerText = "";
+    whiteEval.style.height = `${percentW}%`;
+    blackEvalText.innerText = Math.abs(value);
+    blackEval.style.height = `${percentB}%`;
+  }
+}
+
+function stockfishAnalysis(currFEN) {
   bestMoveBtn.disabled = true;
   bestMoveBtn.innerText = "Calculating...";
   topEngineLineBtn.disabled = true;
@@ -53,6 +87,23 @@ function updateEvalBar(currFEN) {
       let bestMoveRes = data.bestmove;
       bestMove = bestMoveRes.split(" ")[1];
       topEngineLine = data.continuation;
+      evaluation = data.evaluation;
+      let mate = data.mate;
+      if (mate != null) {
+        if (mate > 0) {
+          whiteEvalText.innerText = `M${mate}`;
+          whiteEval.style.height = "100%";
+          blackEvalText.innerText = "";
+          blackEval.style.height = "0%";
+        } else {
+          blackEvalText.innerText = `M${mate}`;
+          blackEval.style.height = "100%";
+          whiteEvalText.innerText = "";
+          whiteEval.style.height = "0%";
+        }
+      } else {
+        updateEvalBar(evaluation);
+      }
     }
   };
   xhr.send();
@@ -120,28 +171,28 @@ startingPos.addEventListener("click", () => {
   pointer = 0;
   let currFEN = matchArr[pointer];
   board.position(currFEN);
-  updateEvalBar(currFEN);
+  stockfishAnalysis(currFEN);
 });
 backward.addEventListener("click", () => {
   if (allowed == false) return;
   pointer = Math.max(0, --pointer);
   let currFEN = matchArr[pointer];
   board.position(currFEN);
-  updateEvalBar(currFEN);
+  stockfishAnalysis(currFEN);
 });
 forward.addEventListener("click", () => {
   if (allowed == false) return;
   pointer = Math.min(len - 1, ++pointer);
   let currFEN = matchArr[pointer];
   board.position(currFEN);
-  updateEvalBar(currFEN);
+  stockfishAnalysis(currFEN);
 });
 endingPos.addEventListener("click", () => {
   if (allowed == false) return;
   pointer = len - 1;
   let currFEN = matchArr[pointer];
   board.position(currFEN);
-  updateEvalBar(currFEN);
+  stockfishAnalysis(currFEN);
 });
 
 function removeGreySquares() {
@@ -292,6 +343,16 @@ var config = {
 board = Chessboard("myBoard", config);
 if (match.p1Color == "black") {
   board.orientation("black");
+  whiteEval.classList.remove("bg-white");
+  whiteEval.classList.add("bg-black");
+  whiteEval.classList.remove("text-black");
+  whiteEval.classList.add("text-white");
+  blackEval.classList.remove("bg-black");
+  blackEval.classList.add("bg-white");
+  blackEval.classList.remove("text-white");
+  blackEval.classList.add("text-black");
+  [whiteEval, blackEval] = [blackEval, whiteEval];
+  [whiteEvalText, blackEvalText] = [blackEvalText, whiteEvalText];
 }
 updateSidebar(match.history);
 

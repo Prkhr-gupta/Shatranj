@@ -228,6 +228,15 @@ app.get("/logout", (req, res, next) => {
   });
 });
 
+app.get("/leaderboard", async (req, res) => {
+  let allUsers = await User.find().sort({ rating: 1 });
+  res.render("pages/leaderboard", { allUsers });
+});
+
+app.get("/learn", (req, res) => {
+  res.render("pages/learn");
+});
+
 app.get("/:username", async (req, res) => {
   let { username } = req.params;
   let user = await User.findOne({ username: username }).populate("matches");

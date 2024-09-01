@@ -114,7 +114,17 @@ module.exports = (io) => {
       let currRating = user.rating;
       if (currRating < 50) ratingChange = 0;
       let newRating = currRating + ratingChange;
-      await User.updateOne({ username: username }, { rating: newRating });
+      let title = "Beginner";
+      if (newRating >= 1000 && newRating < 1500) title = "Intermediate";
+      if (newRating >= 1500 && newRating < 2000) title = "Candidate Master";
+      if (newRating >= 2000 && newRating < 2500) title = "FIDE Master";
+      if (newRating >= 2500 && newRating < 3000) title = "International Master";
+      if (newRating >= 3000) title = "Grandmaster";
+      await User.updateOne(
+        { username: username },
+        { rating: newRating },
+        { title: title }
+      );
       games[mode][roomId].gameOver = true;
       io.to(username).emit("game results", currRating, ratingChange, newRating);
       let opponent = games[mode][roomId].player1;

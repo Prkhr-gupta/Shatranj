@@ -155,7 +155,7 @@ function makeRandomMove() {
   let li = document.createElement("li");
   li.innerText = currMove;
   li.style.marginTop = "0.5rem";
-  let color = ";";
+  let color = "";
   if (cnt % 2) color = "rgb(28, 28, 28)";
   li.style.backgroundColor = color;
 

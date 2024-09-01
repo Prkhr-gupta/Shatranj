@@ -3,11 +3,43 @@
 <div class="h-40 bg-neutral-900 rounded-md m-4 flex justify-around">
   <div class="w-full">
     <div class="h-1/2 px-4 flex items-center">
+      <% if(user.title == "Grandmaster") { %>
+      <img
+        class="h-2/3"
+        src="/img/chesspieces/wikipedia/wK.png"
+        alt="Profile Picture"
+      />
+      <% } %> <% if(user.title == "International Master") { %>
       <img
         class="h-2/3"
         src="/img/chesspieces/wikipedia/wQ.png"
         alt="Profile Picture"
       />
+      <% } %> <% if(user.title == "FIDE Master") { %>
+      <img
+        class="h-2/3"
+        src="/img/chesspieces/wikipedia/wR.png"
+        alt="Profile Picture"
+      />
+      <% } %> <% if(user.title == "Candidate Master") { %>
+      <img
+        class="h-2/3"
+        src="/img/chesspieces/wikipedia/wB.png"
+        alt="Profile Picture"
+      />
+      <% } %> <% if(user.title == "Intermediate") { %>
+      <img
+        class="h-2/3"
+        src="/img/chesspieces/wikipedia/wN.png"
+        alt="Profile Picture"
+      />
+      <% } %> <% if(user.title == "Beginner") { %>
+      <img
+        class="h-2/3"
+        src="/img/chesspieces/wikipedia/wP.png"
+        alt="Profile Picture"
+      />
+      <% } %>
       <div class="h-full text-4xl text-neutral-200 flex items-center">
         <%=user.username%>
       </div>

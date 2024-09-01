@@ -53,7 +53,7 @@
               <a class="nav-link active" aria-current="page" href="/">Play</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Learn</a>
+              <a class="nav-link" href="/learn">Learn</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="link" href="/" onclick="handleLink()"
@@ -62,6 +62,9 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/friends">Social</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
           </ul>
         </div>
@@ -102,8 +105,9 @@
   let notifications = document.getElementById("notifications");
 
   function handleLink() {
+    console.log("hello");
     let link = "/login";
-    if (user) {
+    if (user && user != "guest") {
       link = `/${user}`;
     }
     document.getElementById("link").setAttribute("href", link);

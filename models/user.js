@@ -107,6 +107,10 @@ const userSchema = new Schema({
       },
     },
   },
+  title: {
+    type: String,
+    default: "Beginner",
+  },
 });
 
 userSchema.plugin(passportLocalMongoose);
