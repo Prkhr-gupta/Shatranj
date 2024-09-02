@@ -1,44 +1,228 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="flex">
-  <div class="w-1/2 text-white">
-    <div id="board1" style="width: 400px"></div>
-  </div>
-  <div class="w-1/2 text-white"></div>
+<div class="text-center my-12">
+  <h1 class="text-6xl text-white">Learn Chess Basics</h1>
 </div>
 
-<div class="flex">
-  <div class="w-1/2 text-white"></div>
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div id="board1" style="width: 350px"></div>
+  </div>
   <div class="w-1/2 text-white">
-    <div id="board2" style="width: 400px"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wP.png" alt="Pawn" />
+        <h2 class="text-4xl text-white">Pawn</h2>
+      </div>
+      <div class="mr-4">(1 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      Pawns move forward one square at a time, or two squares if they haven't
+      moved yet. They can't move backwards. Pawns are the only pieces that can
+      be promoted to another piece when they reach the last rank.
+      <h3 class="font-bold mt-3">Capture</h3>
+      Pawns capture enemy pieces diagonally in front of them, on either of the
+      two squares.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-28 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="singleMove"
+      >
+        Single move
+      </button>
+      <button
+        class="bg-neutral-200 w-28 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="doubleMove"
+      >
+        Double move
+      </button>
+      <button
+        class="bg-neutral-200 w-28 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="enPassant"
+      >
+        En Passant
+      </button>
+      <button
+        class="bg-neutral-200 w-28 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="promotion"
+      >
+        Promotion
+      </button>
+    </div>
   </div>
 </div>
 
-<div class="flex">
-  <div class="w-1/2 text-white">
-    <div id="board3" style="width: 400px"></div>
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wN.png" alt="Knight" />
+        <h2 class="text-4xl text-white">Knight</h2>
+      </div>
+      <div class="mr-4">(3 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      The knight is the only piece in chess that can move in an L-shape, jumping
+      over other pieces, it can move two squares in any direction vertically,
+      then one square horizontally, or vice versa.
+
+      <h3 class="font-bold mt-3">Capture</h3>
+      The knight captures enemy pieces by replacing them on the square it lands
+      on.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-32 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="knightMove"
+      >
+        Knights moves
+      </button>
+    </div>
   </div>
-  <div class="w-1/2 text-white"></div>
+  <div class="w-1/2 text-white flex justify-end mr-20">
+    <div id="board2" style="width: 350px"></div>
+  </div>
 </div>
 
-<div class="flex">
-  <div class="w-1/2 text-white"></div>
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div id="board3" style="width: 350px"></div>
+  </div>
   <div class="w-1/2 text-white">
-    <div id="board4" style="width: 400px"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wB.png" alt="Bishop" />
+        <h2 class="text-4xl text-white">Bishop</h2>
+      </div>
+      <div class="mr-4">(3 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      Bishops move diagonally in any direction, one to seven squares at a time,
+      as long as the squares are clear. Bishops can only move on squares of the
+      same color they start on.
+      <h3 class="font-bold mt-3">Weakness</h3>
+      Bishops can be trapped behind blocked pawns, making them almost useless.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-32 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="bishopMove"
+      >
+        Bishop moves
+      </button>
+    </div>
   </div>
 </div>
 
-<div class="flex">
-  <div class="w-1/2 text-white">
-    <div id="board5" style="width: 400px"></div>
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wR.png" alt="Rook" />
+        <h2 class="text-4xl text-white">Rook</h2>
+      </div>
+      <div class="mr-4">(5 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      Rooks can move any number of squares horizontally or vertically without
+      jumping, but they can't move diagonally. They can only move if the rank or
+      file next to them is clear.
+      <h3 class="font-bold mt-3">Castling</h3>
+      Rooks participate in a special move called castling.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-32 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="rookMove"
+      >
+        Rook moves
+      </button>
+    </div>
   </div>
-  <div class="w-1/2 text-white"></div>
+  <div class="w-1/2 text-white flex justify-end mr-20">
+    <div id="board4" style="width: 350px"></div>
+  </div>
 </div>
 
-<div class="flex">
-  <div class="w-1/2 text-white"></div>
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div id="board5" style="width: 350px"></div>
+  </div>
   <div class="w-1/2 text-white">
-    <div id="board6" style="width: 400px"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wQ.png" alt="Queen" />
+        <h2 class="text-4xl text-white">Queen</h2>
+      </div>
+      <div class="mr-4">(9 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      The queen can move any number of squares in any direction, including
+      vertically, horizontally, or diagonally.
+      <h3 class="font-bold mt-3">Power</h3>
+      The queen is the most powerful piece in chess, combining the powers of the
+      rook and bishop. A pawn is promoted to a queen in the vast majority of
+      cases.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-32 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="queenMove"
+      >
+        Queen moves
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="flex bg-neutral-900 rounded-lg m-4 p-4">
+  <div class="w-1/2 text-white ml-20">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="/img/chesspieces/wikipedia/wK.png" alt="King" />
+        <h2 class="text-4xl text-white">King</h2>
+      </div>
+      <div class="mr-4">(3.5 point)</div>
+    </div>
+    <div>
+      <h3 class="font-bold mt-3">Movement</h3>
+      The king can move one square in any direction, but it can't move into
+      check or onto a square occupied by a friendly piece.
+
+      <h3 class="font-bold mt-3">Role</h3>
+      The king is the most important piece in chess, but it's also the weakest.
+      The goal of chess is to checkmate the opponent's king. If the king is in
+      check and can't escape, it's checkmate and the game ends.
+    </div>
+    <div class="mt-4">
+      <button
+        class="bg-neutral-200 w-32 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="kingMove"
+      >
+        King moves
+      </button>
+      <button
+        class="bg-neutral-200 w-36 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="kingSideCastle"
+      >
+        King Side Castle
+      </button>
+      <button
+        class="bg-neutral-200 w-40 h-8 mr-2 rounded-lg text-black hover:bg-neutral-400 active:bg-neutral-600"
+        id="queenSideCastle"
+      >
+        Queen Side Castle
+      </button>
+    </div>
+  </div>
+  <div class="w-1/2 text-white flex justify-end mr-20">
+    <div id="board6" style="width: 350px"></div>
   </div>
 </div>
 
@@ -49,7 +233,12 @@
 ></script>
 <script src="/assets/js/chess-0.10.3.min.js"></script>
 <script src="/assets/js/chessboard-1.0.0.min.js"></script>
-<script src="/assets/js/learn.js"></script>
+<script src="/assets/js/learn/pawn.js"></script>
+<script src="/assets/js/learn/knight.js"></script>
+<script src="/assets/js/learn/bishop.js"></script>
+<script src="/assets/js/learn/rook.js"></script>
+<script src="/assets/js/learn/queen.js"></script>
+<script src="/assets/js/learn/king.js"></script>
 <script>
   let user = "guest";
   <% if(currUser) { %>
