@@ -93,10 +93,6 @@ module.exports = (io) => {
                 }
               }, 1000);
             });
-            // async function sleep(fn, ...args) {
-            //   await timeout(3000);
-            //   return fn(...args);
-            // }
           }
         }
         io.to(socket.id).emit("enterGame", games[mode][roomId]);
@@ -211,7 +207,6 @@ module.exports = (io) => {
     socket.on("challenge", async (user, opponent, gamemode, color) => {
       let user1 = await User.findOne({ username: user });
       let user2 = await User.findOne({ username: opponent });
-      console.log("challenger color : ", color);
       if (user2.isPlaying == true) {
         io.to(user).emit("challenge failed", opponent);
       } else if (user1.isPlaying == true) {
@@ -220,7 +215,6 @@ module.exports = (io) => {
         let opponentColor = "random";
         if (color == "white") opponentColor = "black";
         if (color == "black") opponentColor = "white";
-        console.log("opponent color : ", opponentColor);
         io.to(opponent).emit("challenge", user, gamemode, opponentColor);
       }
     });
@@ -281,7 +275,6 @@ module.exports = (io) => {
     });
 
     socket.on("declined", async (username1, username2) => {
-      console.log(username1);
       await User.updateOne(
         { username: username2 },
         { $pull: { requests: username1 } }
@@ -304,7 +297,6 @@ module.exports = (io) => {
 
     socket.on("userConnect", async (username) => {
       socket.join(username);
-      console.log(username, "connected");
       socket.privateRoom = username;
       let user = await User.findOneAndUpdate(
         { username: username },
@@ -317,7 +309,6 @@ module.exports = (io) => {
 
     socket.on("disconnect", async () => {
       let username = socket.privateRoom;
-      console.log(username, "disconnected");
       let user = await User.findOneAndUpdate(
         { username: username },
         { $set: { isOnline: false } }

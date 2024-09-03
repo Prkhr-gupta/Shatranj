@@ -61,7 +61,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/friends">Social</a>
+              <a class="nav-link" href="/user/friends">Social</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/leaderboard">Leaderboard</a>
@@ -83,13 +83,13 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
                 <% if(!currUser) { %>
-                <li><a class="dropdown-item" href="/login">Log In</a></li>
+                <li><a class="dropdown-item" href="/user/login">Log In</a></li>
                 <li>
-                  <a class="dropdown-item" href="/signup">Sign Up</a>
+                  <a class="dropdown-item" href="/user/signup">Sign Up</a>
                 </li>
                 <% } %> <% if(currUser) { %>
                 <li>
-                  <a class="dropdown-item" href="/logout">Log Out</a>
+                  <a class="dropdown-item" href="/user/logout">Log Out</a>
                 </li>
                 <% } %>
               </ul>
@@ -106,9 +106,9 @@
 
   function handleLink() {
     console.log("hello");
-    let link = "/login";
+    let link = "/user/login";
     if (user && user != "guest") {
-      link = `/${user}`;
+      link = `/user/${user}`;
     }
     document.getElementById("link").setAttribute("href", link);
   }
@@ -120,7 +120,7 @@
 
   socket.on("room id", (mode, roomId, color) => {
     window.location.replace(
-      `/online?mode=${mode}&roomId=${roomId}&color=${color}`
+      `/match/online?mode=${mode}&roomId=${roomId}&color=${color}`
     );
   });
 

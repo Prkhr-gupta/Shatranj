@@ -10,12 +10,11 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const Match = require("./models/match.js");
 const User = require("./models/user.js");
-const Chat = require("./models/chat.js");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const { isLoggedIn, saveRedirectUrl } = require("./middleware.js");
+const matchRouter = require("./routes/match.js");
+const userRouter = require("./routes/user.js");
 
 const app = express();
 const server = createServer(app);
@@ -76,177 +75,20 @@ app.get("/", (req, res) => {
   res.render("pages/home.ejs");
 });
 
-// app.get("/testMatch", async (req, res) => {
-//   let sampleMatch = new Match({
-//     roomId: "randomId123",
-//     history: ["e4", "e5"],
-//     verbose: [
-//       {
-//         from: "e2",
-//         to: "e4",
-//         flags: "b",
-//       },
-//       {
-//         from: "e2",
-//         to: "e4",
-//       },
-//     ],
-//     lastMoveColor: "black",
-//     player1Color: "white",
-//     player2Color: "black",
-//     gameHasStarted: true,
-//     gameOver: true,
-//     timer1: 12,
-//     timer2: 0,
-//     chats: [
-//       { text: "hello", color: "white" },
-//       { text: "hi", color: "black" },
-//       { text: "noob", color: "white" },
-//     ],
-//   });
-//   sampleMatch.markModified("verbose");
-//   await sampleMatch.save();
-//   res.send("Match saved");
-// });
+app.use("/match", matchRouter);
 
-app.get("/computer", (req, res) => {
-  res.render("pages/computer");
-});
+app.use("/user", userRouter);
 
-app.get("/online", isLoggedIn, (req, res) => {
-  res.render("pages/bullet.ejs");
-});
-
-app.get("/friends", isLoggedIn, async (req, res) => {
-  let username = req.user.username;
-  let currUser = await User.findOne({ username: `${username}` }).populate(
-    "friends"
-  );
-  res.render("pages/friends.ejs", { currUser });
-});
-
-app.get("/user/find/:username", async (req, res) => {
-  let { username } = req.params;
-  let user = await User.findOne({ username: `${username}` });
-  res.send(user);
-});
-
-app.get("/user/chats/:username/:friend", async (req, res) => {
-  let { username, friend } = req.params;
-  console.log(username, friend);
-  let chats = await Chat.find({
-    $or: [
-      { from: username, to: friend },
-      { from: friend, to: username },
-    ],
-  });
-  await Chat.updateMany(
-    { from: friend, to: username, isRead: false },
-    { $set: { isRead: true } }
-  );
-  res.send(chats);
-});
-
-app.get("/user/read/:username/:friend", async (req, res) => {
-  let { username, friend } = req.params;
-  await Chat.updateMany(
-    { from: friend, to: username, isRead: false },
-    { $set: { isRead: true } }
-  );
-  res.send("null");
-});
-
-app.get("/user/unread/:username/:friend", async (req, res) => {
-  let { username, friend } = req.params;
-  let unReadCnt = await Chat.countDocuments({
-    from: friend,
-    to: username,
-    isRead: false,
-  });
-  res.send(`${unReadCnt}`);
-});
-
-app.get("/user/unread/:username", async (req, res) => {
-  let { username, friend } = req.params;
-  let unReadCnt = await Chat.countDocuments({
-    to: username,
-    isRead: false,
-  });
-  res.send(`${unReadCnt}`);
-});
-
-app.get("/signup", (req, res) => {
-  res.render("pages/signup.ejs");
-});
-
-app.post(
-  "/signup",
+app.get(
+  "/leaderboard",
   wrapAsync(async (req, res) => {
-    try {
-      let { username, email, password } = req.body;
-      const newUser = new User({ email, username });
-      const registeredUser = await User.register(newUser, password);
-      req.login(registeredUser, (err) => {
-        if (err) {
-          return next(err);
-        }
-        req.flash("success", "Welcome to Shatranj, play chess online!");
-        res.redirect("/");
-      });
-    } catch (err) {
-      req.flash("error", `${err.message}!`);
-      res.redirect("/signup");
-    }
+    let allUsers = await User.find().sort({ rating: 1 });
+    res.render("pages/leaderboard", { allUsers });
   })
 );
 
-app.get("/login", (req, res) => {
-  res.render("pages/login.ejs");
-});
-
-app.post(
-  "/login",
-  saveRedirectUrl,
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  (req, res) => {
-    req.flash("success", "Log in successful!");
-    let redirectUrl = res.locals.redirectUrl || "/";
-    res.redirect(redirectUrl);
-  }
-);
-
-app.get("/logout", (req, res, next) => {
-  req.logOut((err) => {
-    if (err) {
-      return next(err);
-    }
-    req.flash("success", "You are logged out!");
-    res.redirect("/");
-  });
-});
-
-app.get("/leaderboard", async (req, res) => {
-  let allUsers = await User.find().sort({ rating: 1 });
-  res.render("pages/leaderboard", { allUsers });
-});
-
 app.get("/learn", (req, res) => {
   res.render("pages/learn");
-});
-
-app.get("/:username", async (req, res) => {
-  let { username } = req.params;
-  let user = await User.findOne({ username: username }).populate("matches");
-  res.render("pages/games.ejs", { user });
-});
-
-app.get("/review/:gameId", async (req, res) => {
-  let { gameId } = req.params;
-  let match = await Match.findById(gameId);
-  res.render("pages/review.ejs", { match });
 });
 
 app.all("*", (req, res, next) => {

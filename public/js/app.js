@@ -9,4 +9,7 @@ window.addEventListener("load", () => {
       else clearInterval(id);
     }, 5);
   }
+  setTimeout(() => {
+    $(".flash").alert("close");
+  }, 2000);
 });

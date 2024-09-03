@@ -7,7 +7,7 @@
     <div class="hidden" id="fen"></div>
     <label class="hidden">PGN:</label>
     <div class="hidden" id="pgn"></div>
-    <div class="m-4 text-center">Opening</div>
+    <div class="m-4 text-center" id="opening">Opening</div>
     <div
       class="flex justify-center h-80 outline outline-neutral-800 overflow-y-scroll pt-2 moveTimeline"
     >
@@ -88,7 +88,7 @@
     </div>
     <div
       class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2 hover:bg-neutral-400 cursor-pointer"
-      onclick="window.location.replace('http://localhost:8080/computer')"
+      onclick="window.location.replace('/match/computer')"
       id="computer"
     >
       Play Computer
@@ -97,7 +97,7 @@
       class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2 hover:bg-neutral-400 cursor-pointer"
       id="friend"
     >
-      <form method="get" action="/friends" class="h-full w-full">
+      <form method="get" action="/user/friends" class="h-full w-full">
         <button class="h-full w-full">Play a Friend</button>
       </form>
     </div>
@@ -144,7 +144,7 @@
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);
-    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.open("GET", `../user/unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       badge.style.display = "block";

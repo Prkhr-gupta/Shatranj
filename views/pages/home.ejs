@@ -8,7 +8,7 @@
     <div class="hidden" id="fen"></div>
     <label class="hidden">PGN:</label>
     <div class="hidden" id="pgn"></div>
-    <div class="m-4 text-center">Opening</div>
+    <div class="m-4 text-center" id="opening">Opening</div>
     <div
       class="flex justify-center h-80 outline outline-neutral-800 overflow-y-scroll pt-2 moveTimeline"
     >
@@ -28,10 +28,18 @@
         </ul>
       </div>
     </div>
+    <div class="mx-4 my-8 h-12 flex justify-evenly items-center">
+      <button
+        class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 w-24 h-8 text-black rounded-lg"
+        id="reset"
+      >
+        Reset
+      </button>
+    </div>
   </div>
   <div>
     <div class="text-white">Player 2</div>
-    <div id="myBoard" style="width: 460px"></div>
+    <div id="myBoard" style="width: 29rem"></div>
     <div class="text-white">Player 1</div>
   </div>
   <div
@@ -72,7 +80,7 @@
     </div>
     <div
       class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2 hover:bg-neutral-400 cursor-pointer"
-      onclick="window.location.replace('http://localhost:8080/computer')"
+      onclick="window.location.replace('/match/computer')"
       id="computer"
     >
       Play Computer
@@ -81,7 +89,7 @@
       class="h-16 w-11/12 bg-neutral-200 flex justify-center items-center rounded-2xl m-2 hover:bg-neutral-400 cursor-pointer"
       id="friend"
     >
-      <form method="get" action="/friends" class="h-full w-full">
+      <form method="get" action="/user/friends" class="h-full w-full">
         <button class="h-full w-full">Play a Friend</button>
       </form>
     </div>
@@ -95,13 +103,15 @@
 <script src="/assets/js/chessboard-1.0.0.js"></script>
 <script src="/assets/js/chessboard-1.0.0.min.js"></script>
 <script src="/assets/js/chess-0.10.3.min.js"></script>
-<script src="/assets/js/player.js"></script>
+<script src="/assets/js/player.js" type="module"></script>
 <script>
   let modes = document.getElementById("modes");
   let drop_btn = document.getElementById("drop_btn");
   let computer = document.getElementById("computer");
   let friend = document.getElementById("friend");
   let bullet = document.getElementById("bullet");
+  let blitz = document.getElementById("blitz");
+  let rapid = document.getElementById("rapid");
   drop_btn.addEventListener("click", () => {
     if (modes.style.display == "none") {
       modes.style.display = "block";

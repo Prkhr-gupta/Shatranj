@@ -1,10 +1,20 @@
-// import Swal from "sweetalert2";
+import { openings } from "../opening.js";
+var opening = document.getElementById("opening");
+var currOp = "";
 var board = null;
 var game = new Chess();
 var $status = $("#status");
 var $fen = $("#fen");
 var $pgn = $("#pgn");
-var moveSound = new Audio("./assets/sounds/move-self.mp3");
+var moveSound = new Audio("../assets/sounds/move-self.mp3");
+var captureSound = new Audio("../assets/sounds/capture.mp3");
+var castleSound = new Audio("../assets/sounds/castle.mp3");
+var gameEndSound = new Audio("../assets/sounds/game-end.webm");
+var gameStartSound = new Audio("../assets/sounds/game-start.mp3");
+var checkSound = new Audio("../assets/sounds/move-check.mp3");
+var lowTimeSound = new Audio("../assets/sounds/tenseconds.mp3");
+var promoteSound = new Audio("../assets/sounds/promote.mp3");
+var notifySound = new Audio("../assets/sounds/notify.mp3");
 var whiteSquareGrey = "#a9a9a9";
 var blackSquareGrey = "#696969";
 var redSquareRed = "#ff0000";
@@ -19,7 +29,7 @@ var resign = document.getElementById("resign");
 var gameOver = false;
 
 rematch.addEventListener("click", () => {
-  window.location.replace("http://localhost:8080/computer");
+  window.location.replace("/match/computer");
 });
 
 resign.addEventListener("click", () => {
@@ -67,6 +77,7 @@ window.addEventListener("load", () => {
       denyButton: "Swal-btn-deny",
     },
   }).then((result) => {
+    gameStartSound.play();
     if (!result.isConfirmed) {
       player_color = "Black";
       board.orientation("black");
@@ -76,6 +87,7 @@ window.addEventListener("load", () => {
 });
 
 function gameAlert(title, msg, icon) {
+  gameEndSound.play();
   Swal.fire({
     title: `${title}`,
     text: `${msg}`,
@@ -93,7 +105,7 @@ function gameAlert(title, msg, icon) {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      window.location.replace("http://localhost:8080/computer");
+      window.location.replace("/match/computer");
     } else {
       resign.style.display = "none";
     }
@@ -160,6 +172,8 @@ function makeRandomMove() {
   li.style.backgroundColor = color;
 
   if (turn === "w") {
+    if (currOp == "") currOp = currMove;
+    else currOp = currOp + " " + currMove;
     let liCnt = document.createElement("li");
     liCnt.innerText = cnt + ".";
     liCnt.style.marginTop = "0.5rem";
@@ -167,8 +181,17 @@ function makeRandomMove() {
     moveCnt.appendChild(liCnt);
     whiteMove.appendChild(li);
   } else {
+    currOp = currOp + " " + currMove;
     blackMove.appendChild(li);
     cnt++;
+  }
+  if (cnt <= 3) {
+    for (let open of openings) {
+      if (open.moves == currOp) {
+        opening.innerText = open.name;
+        break;
+      }
+    }
   }
   messageBody.scrollTop = messageBody.scrollHeight;
   moveSound.play();
@@ -195,6 +218,8 @@ function onDrop(source, target) {
   if (cnt % 2) color = "rgb(28, 28, 28)";
   li.style.backgroundColor = color;
   if (move.color === "w") {
+    if (currOp == "") currOp = currMove;
+    else currOp = currOp + " " + currMove;
     let liCnt = document.createElement("li");
     liCnt.innerText = cnt + ".";
     liCnt.style.marginTop = "0.5rem";
@@ -202,8 +227,17 @@ function onDrop(source, target) {
     moveCnt.appendChild(liCnt);
     whiteMove.appendChild(li);
   } else {
+    currOp = currOp + " " + currMove;
     blackMove.appendChild(li);
     cnt++;
+  }
+  if (cnt <= 3) {
+    for (let open of openings) {
+      if (open.moves == currOp) {
+        opening.innerText = open.name;
+        break;
+      }
+    }
   }
   messageBody.scrollTop = messageBody.scrollHeight;
 
@@ -279,10 +313,19 @@ function updateStatus() {
     let king = game.turn() + "K";
     // check?
     if (game.in_check()) {
+      checkSound.play();
       let kingPosition = getKeyByValue(board.position(), king);
       redSquare(kingPosition);
       status += ", " + moveColor + " is in check";
     } else {
+      let history = game.history({ verbose: true });
+      let lastMove = history[history.length - 1];
+      let moveType = typeof lastMove === "undefined" ? "z" : lastMove.flags;
+
+      if (moveType == "n" || moveType == "b") moveSound.play();
+      else if (moveType == "e" || moveType == "c") captureSound.play();
+      else if (moveType == "p") promoteSound.play();
+      else if (moveType == "k" || moveType == "q") castleSound.play();
     }
   }
 

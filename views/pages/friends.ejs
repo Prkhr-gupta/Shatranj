@@ -242,7 +242,7 @@
         <div class="m-2">
           <button class="mx-1" id="sendMsg">
             <img
-              class="h-6 active:scale-50"
+              class="h-6 active:scale-90"
               src="/img/sendMsg.png"
               alt="sendMsg"
             />
@@ -268,15 +268,16 @@
   let allFriends = document.getElementById("allFriends");
   let friends = [];
   let removeFriendBtns = document.querySelectorAll(".removeFriend");
-  let notifySound = new Audio("./assets/sounds/notify.mp3");
+  let notifySound = new Audio("../assets/sounds/notify.mp3");
   let noFriends = document.getElementById("noFriends");
   let selectFriendBtns = document.querySelectorAll(".selectFriend");
   let selectedFriend = document.getElementById("selectedFriend");
   let createChallengeForm = document.getElementById("createChallengeForm");
   let sendChallenge = true;
 
+  //search and send friend request
   function search() {
-    xhr.open("GET", `user/find/${addFriend.value}`, true);
+    xhr.open("GET", `find/${addFriend.value}`, true);
     xhr.onload = () => {
       let data = xhr.responseText;
       addFriend.value = "";
@@ -345,6 +346,7 @@
     }
   });
 
+  //Incoming friend request
   function createReq(from) {
     let li = document.createElement("li");
     let span = document.createElement("span");
@@ -474,6 +476,7 @@
     allFriends.prepend(div);
   });
 
+  //Incoming message
   function createMsg(text, pos) {
     let msg = document.createElement("div");
     msg.innerText = text;
@@ -501,6 +504,7 @@
     msgBox.scrollTop = msgBox.scrollHeight;
   }
 
+  //Outgoing messages
   send.addEventListener("click", () => {
     if (text.value !== "" && currChat.innerText !== "") {
       createMsg(text.value, "self-end");
@@ -543,7 +547,7 @@
     badge.innerText = parseInt(badge.innerText) - read;
     if (parseInt(badge.innerText) == 0) badge.style.display = "none";
     badgeId.innerText = 0;
-    xhr.open("GET", `user/chats/<%= currUser.username %>/${msgBtnId}`, false);
+    xhr.open("GET", `chats/<%= currUser.username %>/${msgBtnId}`, false);
     xhr.onload = () => {
       let chats = JSON.parse(xhr.responseText);
       // console.log("the chats");
@@ -560,7 +564,7 @@
 
   for (let msgBtn of msgBtns) {
     friends.push(msgBtn.id);
-    xhr.open("GET", `user/unread/<%= currUser.username %>/${msgBtn.id}`, false);
+    xhr.open("GET", `unread/<%= currUser.username %>/${msgBtn.id}`, false);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       let badge = document.getElementById(`${msgBtn.id}badge`);
@@ -573,6 +577,7 @@
     });
   }
 
+  //select friend for challenge
   function selectFriend(friend) {
     selectedFriend.innerText = friend;
     selectedFriend.style.fontSize = "1rem";
@@ -584,6 +589,7 @@
     });
   }
 
+  //remove friend from list
   function removeFriend(friend) {
     Swal.fire({
       text: `Remove ${friend} from friends`,
@@ -623,6 +629,7 @@
     });
   }
 
+  //Incoming message
   socket.on("msg recieved", (text, from) => {
     notifySound.play();
     if (currChat.innerText != from) {
@@ -630,7 +637,7 @@
       badgeId.style.display = "block";
       badgeId.innerText = parseInt(badgeId.innerText) + 1;
     } else {
-      xhr.open("GET", `user/read/<%= currUser.username %>/${from}`, false);
+      xhr.open("GET", `read/<%= currUser.username %>/${from}`, false);
       xhr.onload = () => {};
       xhr.send();
       createMsg(text, "self-start");
@@ -639,6 +646,7 @@
     }
   });
 
+  //create Challenge
   createChallengeForm.addEventListener("submit", (event) => {
     event.preventDefault();
     let gamemode = event.target.gamemode.value;
@@ -695,10 +703,10 @@
       });
   });
 
+  //friend current status(online/offline)
   socket.on("friend connected", (friend) => {
     console.log(`${friend} connected`);
     let isOnline = document.getElementById(`${friend}isOnline`);
-    console.log(isOnline);
     isOnline.style.display = "block";
   });
 
@@ -713,7 +721,7 @@
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);
-    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.open("GET", `unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       badge.style.display = "block";

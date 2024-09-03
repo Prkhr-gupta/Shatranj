@@ -216,7 +216,7 @@
           </th>
           <td class="px-6 py-4">
             <a
-              href="/<%=user.matches[i].player2%>"
+              href="/user/<%=user.matches[i].player2%>"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
               ><%=user.matches[i].player2%></a
             >
@@ -243,7 +243,7 @@
           <td class="px-6 py-4"><%=user.matches[i].moves%></td>
           <td class="px-6 py-4">
             <a
-              href="/review/<%= user.matches[i]._id %>"
+              href="/match/review/<%= user.matches[i]._id %>"
               class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
               >Review</a
             >
@@ -261,7 +261,7 @@
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);
-    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.open("GET", `unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       console.log("fetched", unReadCnt);

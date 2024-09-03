@@ -6,15 +6,15 @@ var game = new Chess();
 var $status = $("#status");
 var $fen = $("#fen");
 var $pgn = $("#pgn");
-var moveSound = new Audio("./assets/sounds/move-self.mp3");
-var captureSound = new Audio("./assets/sounds/capture.mp3");
-var castleSound = new Audio("./assets/sounds/castle.mp3");
-var gameEndSound = new Audio("./assets/sounds/game-end.webm");
-var gameStartSound = new Audio("./assets/sounds/game-start.mp3");
-var checkSound = new Audio("./assets/sounds/move-check.mp3");
-var lowTimeSound = new Audio("./assets/sounds/tenseconds.mp3");
-var promoteSound = new Audio("./assets/sounds/promote.mp3");
-var notifySound = new Audio("./assets/sounds/notify.mp3");
+var moveSound = new Audio("../assets/sounds/move-self.mp3");
+var captureSound = new Audio("../assets/sounds/capture.mp3");
+var castleSound = new Audio("../assets/sounds/castle.mp3");
+var gameEndSound = new Audio("../assets/sounds/game-end.webm");
+var gameStartSound = new Audio("../assets/sounds/game-start.mp3");
+var checkSound = new Audio("../assets/sounds/move-check.mp3");
+var lowTimeSound = new Audio("../assets/sounds/tenseconds.mp3");
+var promoteSound = new Audio("../assets/sounds/promote.mp3");
+var notifySound = new Audio("../assets/sounds/notify.mp3");
 var whiteSquareGrey = "#a9a9a9";
 var blackSquareGrey = "#696969";
 var redSquareRed = "#ff0000";
@@ -535,7 +535,7 @@ socket.on("rematch accepted", (nwRoomId) => {
   }
   socket.emit("leave room", roomId);
   window.location.replace(
-    `/online?mode=${mode}&roomId=${nwRoomId}&color=${nwColor}`
+    `/match/online?mode=${mode}&roomId=${nwRoomId}&color=${nwColor}`
   );
 });
 

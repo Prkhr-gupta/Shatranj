@@ -8,7 +8,12 @@
 >
   <div class="row">
     <div class="col-5 offset-1 mt-16 bg-neutral-900 rounded-2xl px-12">
-      <form method="POST" action="/signup" novalidate class="needs-validation">
+      <form
+        method="POST"
+        action="/user/signup"
+        novalidate
+        class="needs-validation"
+      >
         <h2 class="text-center text-white font-bold text-4xl mt-8 mb-4">
           Sign Up
         </h2>
@@ -90,7 +95,7 @@
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);
-    xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
+    xhr.open("GET", `unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       badge.style.display = "block";
