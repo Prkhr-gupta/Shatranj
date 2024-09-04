@@ -136,7 +136,7 @@
   <% if(currUser) { %>
     user = `<%= currUser.username %>`;
     socket.emit("userConnect", user);
-    xhr.open("GET", `../user/unread/<%= currUser.username %>`, true);
+    xhr.open("GET", `../../user/unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
       badge.style.display = "block";

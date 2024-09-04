@@ -118,6 +118,7 @@ bestMoveBtn.addEventListener("click", () => {
   board.position(matchArr[pointer]);
   let newBestMove = bestMove.slice(0, 2) + "-" + bestMove.slice(2);
   setTimeout(() => {
+    moveSound.play();
     board.move(newBestMove);
   }, 500);
 });
@@ -147,6 +148,7 @@ topEngineLineBtn.addEventListener("click", () => {
     i++;
     if (topMove) {
       topMove = topMove.slice(0, 2) + "-" + topMove.slice(2);
+      moveSound.play();
       board.move(topMove);
       let li = document.createElement("li");
       li.innerText = topMove;
@@ -184,6 +186,7 @@ forward.addEventListener("click", () => {
   if (allowed == false) return;
   pointer = Math.min(len - 1, ++pointer);
   let currFEN = matchArr[pointer];
+  moveSound.play();
   board.position(currFEN);
   stockfishAnalysis(currFEN);
 });

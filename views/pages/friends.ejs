@@ -18,7 +18,7 @@
         />
         <button
           id="searchUser"
-          class="text-white m-4 bg-neutral-700 px-3 py-1 rounded-md hover:bg-neutral-600 active:bg-neutral-500"
+          class="text-white m-4 bg-neutral-700 px-3 py-1 rounded-md hover:bg-neutral-600 active:bg-neutral-500 hidden lg:inline"
         >
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
@@ -112,7 +112,7 @@
     <form class="h-1/2" id="createChallengeForm">
       <div class="h-2/3 flex mt-3">
         <div class="w-full h-full">
-          <div class="text-white text-center text-2xl h-12 pt-1">Gamemode</div>
+          <div class="text-white text-center text-2xl h-12 pt-1 hidden lg:block">Gamemode</div>
           <div id="modes" class="text-center bg-neutral-900 h-2/3 w-full">
             <input
               type="radio"
@@ -165,7 +165,7 @@
           </div>
         </div>
         <div class="w-full h-full">
-          <div class="text-white text-center text-2xl h-12 pt-1">Play as</div>
+          <div class="text-white text-center text-2xl h-12 pt-1 hidden lg:block">Play as</div>
           <div id="color" class="text-center bg-neutral-900 h-2/3 w-full">
             <input
               type="radio"
@@ -335,7 +335,6 @@
 
   serachUser.addEventListener("click", () => {
     if (addFriend.value != "") {
-      console.log(addFriend.value);
       search();
     }
   });
@@ -387,13 +386,11 @@
     li.appendChild(span);
     li.appendChild(btn1);
     li.appendChild(btn2);
-    // li.style.width = "18rem";
     li.classList.add("dropdown-item");
     friendRequests.appendChild(li);
   }
 
   let requests = "<%= currUser.requests %>".split(",");
-  // console.log(requests);
   let cntReq = 0;
   for (let req of requests) {
     if (req != "") {
@@ -550,10 +547,8 @@
     xhr.open("GET", `chats/<%= currUser.username %>/${msgBtnId}`, false);
     xhr.onload = () => {
       let chats = JSON.parse(xhr.responseText);
-      // console.log("the chats");
       msgBox.replaceChildren();
       for (let chat of chats) {
-        // console.log(chat.message);
         if (chat.from == "<%= currUser.username %>")
           createMsg(chat.message, "self-end");
         else createMsg(chat.message, "self-start");
@@ -607,7 +602,6 @@
         if (index > -1) {
           friends.splice(index, 1);
         }
-        console.log(friends);
         socket.emit("removed", "<%= currUser.username %>", friend);
       }
     });
@@ -620,7 +614,6 @@
     if (index > -1) {
       friends.splice(index, 1);
     }
-    console.log(friends);
   });
 
   for (let removeFriendBtn of removeFriendBtns) {
@@ -705,13 +698,11 @@
 
   //friend current status(online/offline)
   socket.on("friend connected", (friend) => {
-    console.log(`${friend} connected`);
     let isOnline = document.getElementById(`${friend}isOnline`);
     isOnline.style.display = "block";
   });
 
   socket.on("friend disconnected", (friend) => {
-    console.log(`${friend} disconnected`);
     let isOnline = document.getElementById(`${friend}isOnline`);
     isOnline.style.display = "none";
   });

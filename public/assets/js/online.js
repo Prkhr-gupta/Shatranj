@@ -43,7 +43,6 @@ function gameAlert(title, msg, icon) {
   gameOver = true;
   socket.emit("game over", mode, roomId, user, icon, gameFEN);
   socket.on("game results", (currRating, ratingChange, newRating) => {
-    console.log(currRating, ratingChange, newRating);
     let sign = "+";
     if (ratingChange < 0) {
       ratingChange = 8;
@@ -243,7 +242,6 @@ function onMouseoverSquare(square, piece) {
 
   // exit if there are no moves available for this square
   if (moves.length === 0) return;
-  // console.log(moves);
   // highlight the square they moused over
   greySquare(square);
 

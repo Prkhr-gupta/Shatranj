@@ -141,7 +141,6 @@
     xhr.open("GET", `user/unread/<%= currUser.username %>`, true);
     xhr.onload = () => {
       let unReadCnt = xhr.responseText;
-      console.log("fetched", unReadCnt);
       badge.style.display = "block";
       if (parseInt(unReadCnt) > 0) badge.innerText = parseInt(unReadCnt);
       else badge.style.display = "none";

@@ -12,7 +12,7 @@
     </button>
     <div class="flex mr-4 h-10">
       <div class="text-white text-3xl mr-4">Shatranj</div>
-      <form action="/friends">
+      <form action="/user/friends">
         <div
           class="h-full text-center text-white flex items-center"
           id="notifications"
@@ -105,7 +105,6 @@
   let notifications = document.getElementById("notifications");
 
   function handleLink() {
-    console.log("hello");
     let link = "/user/login";
     if (user && user != "guest") {
       link = `/user/${user}`;

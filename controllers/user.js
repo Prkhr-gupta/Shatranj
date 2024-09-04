@@ -17,7 +17,6 @@ module.exports.findUser = async (req, res) => {
 
 module.exports.chatUser = async (req, res) => {
   let { username, friend } = req.params;
-  console.log(username, friend);
   let chats = await Chat.find({
     $or: [
       { from: username, to: friend },

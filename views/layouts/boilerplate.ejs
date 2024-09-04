@@ -40,8 +40,11 @@
   </head>
   <body style="min-height: 100%" class="bg-neutral-800">
     <%- include("../includes/navbar.ejs") %>
-    <div class="container-fluid" style="min-height: 100%">
+    <div class="container-fluid portrait:hidden" style="min-height: 100%">
       <%- include("../includes/flash.ejs") %> <%- body %>
+    </div>
+    <div class="text-white text-center mt-4 landscape:hidden">
+      Rotate device
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
