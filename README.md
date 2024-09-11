@@ -7,7 +7,7 @@ Shatranj is a real-time chess platform designed to offer seamless, live chess ex
 
 ## Demo
 
-![App Video](https://res.cloudinary.com/de69w6b8t/video/upload/v1726076707/Screen_Recording_2024-09-11_230200_xap9g3.mp4)
+https://res.cloudinary.com/de69w6b8t/video/upload/v1726076707/Screen_Recording_2024-09-11_230200_xap9g3.mp4
 
 This is the home page showing all the listings available.
 
@@ -15,7 +15,7 @@ This is the home page showing all the listings available.
 
 Authentication and Authorization is provided using Passport npm package which uses hashing and salting techniques.
 
-![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076527/Screenshot_2024-09-09_103028_fhcwhl.png)
+![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076548/Screenshot_2024-09-09_112926_vdeq9d.png)
 
 Users can create their own listings and publish it. Images are stored in Cloudinary, a separate cloud database.
 
