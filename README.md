@@ -15,7 +15,7 @@ persistent messaging window for ongoing conversations even outside of active gam
 
 ![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076548/Screenshot_2024-09-09_112926_vdeq9d.png)
 
-Users can create their own listings and publish it. Images are stored in Cloudinary, a separate cloud database.
+Grind like a grandmaster and climb up the leaderboard!
 
 ![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076527/Screenshot_2024-09-09_103028_fhcwhl.png)
 
