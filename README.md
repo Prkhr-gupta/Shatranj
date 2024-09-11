@@ -25,7 +25,7 @@ Users can create their own listings and publish it. Images are stored in Cloudin
 Added the functionality to show each listing with
 details and also included the option to edit or delete the listing using mongoose queries.
 
-![App Video](https://res.cloudinary.com/de69w6b8t/video/upload/v1726076700/Screen_Recording_2024-09-11_225403_gupawz.mp4)
+https://github.com/user-attachments/assets/44edc4a1-64ac-4575-b5a6-dd51c3d8ff29
 
 Built a review system and also a map feature using Mapbox software to make the website more interactive.
 
