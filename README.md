@@ -10,11 +10,13 @@ Shatranj is a real-time chess platform designed to offer seamless, live chess ex
 
 https://github.com/user-attachments/assets/a0aa77e2-7a96-4c49-b08d-4a9fca27eba9
 
-This is the home page showing all the listings available.
+Developed a dynamic real-time multiplayer chess web application with an integrated live chat system
+using websockets for an engaging online chess experience.
 
 ![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076527/Screenshot_2024-09-09_103929_mv3lxr.png)
 
-Authentication and Authorization is provided using Passport npm package which uses hashing and salting techniques.
+ Built a friend management system, allowing users to add, challenge, and play with friends, featuring a
+persistent messaging window for ongoing conversations even outside of active games.
 
 ![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076548/Screenshot_2024-09-09_112926_vdeq9d.png)
 
@@ -22,33 +24,16 @@ Users can create their own listings and publish it. Images are stored in Cloudin
 
 ![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1726076527/Screenshot_2024-09-09_103028_fhcwhl.png)
 
-Added the functionality to show each listing with
-details and also included the option to edit or delete the listing using mongoose queries.
+Integrated the Stockfish(chess engine) API for advanced game analysis and review, enabling users to
+evaluate and improve their performance with move suggestions and in-depth analysis.
 
 https://github.com/user-attachments/assets/44edc4a1-64ac-4575-b5a6-dd51c3d8ff29
 
-Built a review system and also a map feature using Mapbox software to make the website more interactive.
+I have integrated the Chess.js and Chessboard.js libraries into my project, which significantly improved its functionality by providing seamless chess game logic and an interactive, visually appealing chessboard.
 
-Finally deployed the project using Render.
-
-
-## Database
-
-Used MongoDB Atlas to store the dataset, created the following 4 collections :-
-
-![App Screenshot](https://res.cloudinary.com/de69w6b8t/image/upload/v1722379721/Screenshot_2024-07-31_041823_lpw336.png)
 ## Tech Stack
 
-**Client:** HTML, CSS, JS, Bootstrap, ejs
+**Client:** HTML, CSS, JS, Bootstrap, Tailwind, ejs, Jquery
 
-**Server:** Node.js, Express.js, mongoose, passport, JOI, mapbox, MongoDB Atlas, Cloudinary
+**Server:** Node.js, Express.js, Socket.io, mongoose, passport, MongoDB Atlas
 
-
-
-## Features
-
-- Responsive
-- RESTful API's
-- MVC framework
-- Robust Security
-- Scalable
