@@ -7,7 +7,8 @@ Shatranj is a real-time chess platform designed to offer seamless, live chess ex
 
 ## Demo
 
-https://res.cloudinary.com/de69w6b8t/video/upload/v1726076707/Screen_Recording_2024-09-11_230200_xap9g3.mp4
+
+https://github.com/user-attachments/assets/a0aa77e2-7a96-4c49-b08d-4a9fca27eba9
 
 This is the home page showing all the listings available.
 
